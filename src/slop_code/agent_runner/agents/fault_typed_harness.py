@@ -237,6 +237,16 @@ class FaultTypedHarnessAgent(Agent):
         except AgentError:
             raise
         except Exception as exc:
+            self._record_partial_failure(
+                run_base=run_base,
+                task_sha256=task_sha256,
+                task_bytes=len(task_bytes),
+                before=before,
+                before_identity=before_identity,
+                started_at=started_at,
+                started=started,
+                error=exc,
+            )
             raise AgentError(f"Harness integration failure: {exc}") from exc
         completed = datetime.now(UTC)
         after = _source_tree_manifest(self.session.working_dir)
@@ -367,6 +377,86 @@ class FaultTypedHarnessAgent(Agent):
         checkpoint_dir.mkdir(parents=True, exist_ok=False)
         return checkpoint_dir
 
+    def _record_partial_failure(
+        self,
+        *,
+        run_base: Path,
+        task_sha256: str,
+        task_bytes: int,
+        before: list[dict[str, Any]],
+        before_identity: str,
+        started_at: str,
+        started: datetime,
+        error: Exception,
+    ) -> None:
+        candidates = sorted(
+            (path for path in run_base.iterdir() if path.is_dir()),
+            key=lambda path: path.stat().st_mtime_ns,
+        )
+        if not candidates:
+            return
+        run_dir = candidates[-1]
+        state = _read_json_optional(run_dir / "state.json")
+        reentry = _mapping(state.get("reentry"))
+        fault_records = _mapping(reentry.get("fault_records"))
+        open_faults = [
+            fault
+            for fault in fault_records.values()
+            if isinstance(fault, dict)
+            and fault.get("status") in {"OPEN", "ADDRESSED"}
+        ]
+        telemetry = _summarize_telemetry_optional(run_dir)
+        after = _source_tree_manifest(self.session.working_dir)
+        _assert_clean_submission_manifest(after)
+        tokens = TokenUsage(
+            input=int(telemetry["prompt_tokens"]),
+            output=int(telemetry["generated_tokens"]),
+            cache_read=int(telemetry["cache_tokens"]),
+            reasoning=int(telemetry["reasoning_tokens"]),
+        )
+        self.usage.steps = int(telemetry["model_calls"])
+        self.usage.net_tokens = tokens
+        self.usage.current_tokens = tokens
+        self.current_checkpoint_usage = telemetry
+        self.last_run_directory = run_dir
+        self.last_adapter_result = {
+            "benchmark_session_id": self.benchmark_session_id,
+            "problem": self.problem_name,
+            "checkpoint_index": self.checkpoint_sequence,
+            "task_sha256": task_sha256,
+            "task_bytes": task_bytes,
+            "workspace_before_sha256": before_identity,
+            "workspace_after_sha256": _manifest_identity(after),
+            "workspace_manifest_before": before,
+            "workspace_manifest_after": after,
+            "harness_run_id": state.get("run_id") or run_dir.name,
+            "harness_commit": _git_commit_for_module(Harness),
+            "harness_status": "INFRASTRUCTURE_FAILURE",
+            "harness_state": state.get("current_state"),
+            "accepted_checkpoint": reentry.get("accepted_checkpoint_id"),
+            "review_verdict": None,
+            "open_fault_count": len(open_faults),
+            "terminal_fault": _terminal_fault(state),
+            "adapter_error": {
+                "type": type(error).__name__,
+                "message": str(error),
+            },
+            "model_calls": telemetry["model_calls"],
+            "prompt_tokens": telemetry["prompt_tokens"],
+            "generated_tokens": telemetry["generated_tokens"],
+            "reasoning_tokens": telemetry["reasoning_tokens"],
+            "cache_tokens": telemetry["cache_tokens"],
+            "model_seconds": telemetry["model_seconds"],
+            "wall_seconds": round(
+                (datetime.now(UTC) - started).total_seconds(), 6
+            ),
+            "started_at": started_at,
+            "completed_at": _now(),
+            "run_dir": "harness-run",
+        }
+        self._checkpoint_records.append(dict(self.last_adapter_result))
+        self._flush_session_manifest()
+
     def _flush_session_manifest(self) -> None:
         if self._session_dir is None or self._session_manifest is None:
             return
@@ -415,6 +505,22 @@ def _summarize_telemetry(run_dir: Path) -> dict[str, int | float]:
         )
     totals["model_seconds"] = round(float(totals["model_seconds"]), 6)
     return totals
+
+
+def _summarize_telemetry_optional(
+    run_dir: Path,
+) -> dict[str, int | float]:
+    try:
+        return _summarize_telemetry(run_dir)
+    except (AgentError, OSError, ValueError, json.JSONDecodeError):
+        return {
+            "model_calls": 0,
+            "prompt_tokens": 0,
+            "generated_tokens": 0,
+            "reasoning_tokens": 0,
+            "cache_tokens": 0,
+            "model_seconds": 0.0,
+        }
 
 
 def _source_tree_manifest(root: Path) -> list[dict[str, Any]]:
@@ -554,6 +660,13 @@ def _read_json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise AgentError(f"Harness JSON artifact is not an object: {path}")
     return value
+
+
+def _read_json_optional(path: Path) -> dict[str, Any]:
+    try:
+        return _read_json(path)
+    except (OSError, ValueError, json.JSONDecodeError):
+        return {}
 
 
 def _write_json(path: Path, value: Any) -> None:

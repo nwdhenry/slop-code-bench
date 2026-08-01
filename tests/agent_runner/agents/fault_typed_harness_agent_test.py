@@ -383,6 +383,61 @@ def test_integration_failure_raises_agent_error(tmp_path: Path) -> None:
         session.cleanup()
 
 
+def test_partial_harness_failure_remains_exportable(tmp_path: Path) -> None:
+    class PartialFailureHarness(FakeHarness):
+        def run(
+            self,
+            *,
+            workspace: Path,
+            task: str,
+            run_base: Path,
+            progress: Any,
+        ) -> RunResult:
+            del workspace, task, progress
+            run_dir = run_base / "run_partial"
+            run_dir.mkdir(parents=True)
+            (run_dir / "events.jsonl").write_text("", encoding="utf-8")
+            (run_dir / "state.json").write_text(
+                json.dumps(
+                    {
+                        "run_id": "run_partial",
+                        "current_state": "IMPLEMENT",
+                        "faults": [],
+                        "reentry": {
+                            "accepted_checkpoint_id": "checkpoint_safe",
+                            "fault_records": {},
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            raise FileNotFoundError("missing observed source")
+
+    session = _session(tmp_path)
+    agent = _agent(tmp_path, PartialFailureHarness())
+    artifacts = tmp_path / "checkpoint-output" / "agent"
+    try:
+        agent.setup(session)
+        with pytest.raises(AgentError, match="integration failure"):
+            agent.run("partial task")
+        assert agent.last_adapter_result is not None
+        assert agent.last_adapter_result["harness_status"] == (
+            "INFRASTRUCTURE_FAILURE"
+        )
+        assert agent.last_adapter_result["accepted_checkpoint"] == (
+            "checkpoint_safe"
+        )
+        agent.save_artifacts(artifacts)
+        assert (artifacts / "harness-run" / "state.json").is_file()
+        exported = json.loads(
+            (artifacts / "adapter-result.json").read_text(encoding="utf-8")
+        )
+        assert exported["adapter_error"]["type"] == "FileNotFoundError"
+    finally:
+        agent.cleanup()
+        session.cleanup()
+
+
 def test_harness_checkout_remains_pinned() -> None:
     config = HarnessConfig.from_toml(HARNESS_TOML)
     assert config.model.timeout_seconds == 0
