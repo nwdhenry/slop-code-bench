@@ -216,7 +216,9 @@ def get_task_for_checkpoint(
         entry_file=environment.format_entry_file(entry_file),
         entry_command=environment.get_command(entry_file, is_agent_run=True),
     )
-    with (output_path / common.PROMPT_FILENAME).open("w") as f:
+    with (output_path / common.PROMPT_FILENAME).open(
+        "w", encoding="utf-8"
+    ) as f:
         f.write(prompt)
     return prompt
 

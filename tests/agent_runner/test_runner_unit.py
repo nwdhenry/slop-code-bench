@@ -266,7 +266,10 @@ def test_run_checkpoint_task_runs_inference_when_no_replay() -> None:
 def test_get_task_for_checkpoint_renders_prompt_and_writes_file(
     tmp_path: Path,
 ) -> None:
-    spec_text = "Start with %%%ENTRYPOINT:entry_file%%% and run %%%ENTRYPOINT:entry_command%%%"
+    spec_text = (
+        "Start with %%%ENTRYPOINT:entry_file%%% and run "
+        "%%%ENTRYPOINT:entry_command%%% — then verify ✅"
+    )
     environment = Mock()
     environment.format_entry_file.return_value = "formatted/main.py"
     environment.get_command.return_value = "uv run formatted/main.py"
@@ -283,10 +286,11 @@ def test_get_task_for_checkpoint_renders_prompt_and_writes_file(
 
     expected_text = (
         "START :: Start with formatted/main.py and run uv run formatted/main.py"
+        " — then verify ✅"
     )
     assert prompt == expected_text
 
-    written = (tmp_path / PROMPT_FILENAME).read_text()
+    written = (tmp_path / PROMPT_FILENAME).read_text(encoding="utf-8")
     assert written == expected_text
 
     environment.format_entry_file.assert_called_once_with("main.py")
@@ -765,7 +769,9 @@ def test_run_problem_concurrent_eval_records_failure_and_continues(
         s.usage = _usage()
         return s
 
-    summaries = {f"checkpoint_{i}": make_summary(f"checkpoint_{i}") for i in (1, 2, 3)}
+    summaries = {
+        f"checkpoint_{i}": make_summary(f"checkpoint_{i}") for i in (1, 2, 3)
+    }
     eval_calls: list[str] = []
 
     def make_report() -> Mock:
@@ -817,7 +823,8 @@ def test_run_problem_concurrent_eval_records_failure_and_continues(
 
     # 3. Boundary warning fired exactly once for cp1 (at cp2's boundary).
     boundary_warnings = [
-        call for call in mock_warning.call_args_list
+        call
+        for call in mock_warning.call_args_list
         if call.args
         and "Concurrent eval failed for earlier checkpoint" in call.args[0]
         and call.kwargs.get("checkpoint") == "checkpoint_1"
@@ -829,9 +836,13 @@ def test_run_problem_concurrent_eval_records_failure_and_continues(
 
     # 4. End-of-run summary warning lists cp1 as a failed eval.
     summary_warnings = [
-        call for call in mock_warning.call_args_list
-        if call.args and "Run completed with concurrent eval failures" in call.args[0]
+        call
+        for call in mock_warning.call_args_list
+        if call.args
+        and "Run completed with concurrent eval failures" in call.args[0]
     ]
     assert len(summary_warnings) == 1
-    assert summary_warnings[0].kwargs.get("failed_checkpoints") == ["checkpoint_1"]
+    assert summary_warnings[0].kwargs.get("failed_checkpoints") == [
+        "checkpoint_1"
+    ]
     assert summary_warnings[0].kwargs.get("count") == 1
