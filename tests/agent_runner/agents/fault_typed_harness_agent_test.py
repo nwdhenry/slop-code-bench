@@ -335,6 +335,25 @@ def test_nested_run_root_is_rejected_before_creation(tmp_path: Path) -> None:
         session.cleanup()
 
 
+def test_campaign_identity_and_external_root_are_runtime_bound(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    external = tmp_path / "campaign"
+    monkeypatch.setenv("FAULT_TYPED_HARNESS_RUN_ROOT", str(external))
+    monkeypatch.setenv("SCBENCH_BENCHMARK_SESSION_ID", "session-0001")
+    agent = _agent(tmp_path, FakeHarness())
+    session = _session(tmp_path)
+
+    try:
+        agent.setup(session)
+        assert agent.run_root == external.resolve()
+        assert agent.benchmark_session_id == "session-0001"
+        assert (external / "session-0001" / "session.json").is_file()
+    finally:
+        agent.cleanup()
+        session.cleanup()
+
+
 def test_forbidden_workspace_file_is_detected_before_model_execution(
     tmp_path: Path,
 ) -> None:

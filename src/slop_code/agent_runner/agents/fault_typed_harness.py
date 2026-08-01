@@ -88,12 +88,14 @@ class FaultTypedHarnessAgent(Agent):
         )
         self.harness_config_path = harness_config_path.resolve()
         self.harness_config = harness_config
-        self.run_root = run_root.resolve()
+        configured_run_root = os.environ.get("FAULT_TYPED_HARNESS_RUN_ROOT")
+        self.run_root = Path(configured_run_root or run_root).resolve()
         self.selected_model = selected_model
         self.copy_full_run = copy_full_run
         self._harness = harness or Harness(harness_config)
         self._session: Session | None = None
-        self.benchmark_session_id = f"scbench_{uuid.uuid4().hex}"
+        requested_session_id = os.environ.get("SCBENCH_BENCHMARK_SESSION_ID")
+        self.benchmark_session_id = _session_id(requested_session_id)
         self.checkpoint_sequence = 0
         self.last_result: RunResult | None = None
         self.last_run_directory: Path | None = None
@@ -177,7 +179,12 @@ class FaultTypedHarnessAgent(Agent):
             )
         self._session = session
         self._session_dir = self.run_root / self.benchmark_session_id
-        self._session_dir.mkdir(parents=True, exist_ok=False)
+        self._session_dir.mkdir(parents=True, exist_ok=True)
+        if (self._session_dir / "session.json").exists():
+            raise AgentError(
+                "Benchmark session evidence already exists: "
+                f"{self._session_dir}"
+            )
         self._session_manifest = {
             "benchmark_session_id": self.benchmark_session_id,
             "problem": self.problem_name,
@@ -580,6 +587,18 @@ def _is_relative_to(path: Path, parent: Path) -> bool:
 
 def _now() -> str:
     return datetime.now(UTC).isoformat()
+
+
+def _session_id(requested: str | None) -> str:
+    if requested is None:
+        return f"scbench_{uuid.uuid4().hex}"
+    if not requested or any(
+        character
+        not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
+        for character in requested
+    ):
+        raise AgentError(f"Invalid benchmark session identity: {requested!r}")
+    return requested
 
 
 register_agent("fault_typed_harness", FaultTypedHarnessAgent)
