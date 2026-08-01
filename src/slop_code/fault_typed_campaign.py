@@ -159,6 +159,9 @@ def _scbench_command(
     agent: str,
     model: str,
 ) -> list[str]:
+    agent_config = (
+        "fault-typed-harness" if agent == "fault_typed_harness" else agent
+    )
     executable = Path(sys.executable).with_name("slop-code.exe")
     if not executable.is_file():
         executable = Path(sys.executable).with_name("slop-code")
@@ -172,7 +175,7 @@ def _scbench_command(
         "--problem",
         problem,
         "--agent",
-        agent,
+        agent_config,
         "--model",
         f"local_llama_cpp/{model}",
         "--no-live-progress",

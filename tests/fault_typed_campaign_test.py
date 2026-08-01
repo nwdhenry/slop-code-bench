@@ -59,7 +59,7 @@ def test_scbench_command_is_local_fixed_and_has_no_timeout(
 
     assert command[1:4] == ["--seed", "7", "run"]
     assert "--problem" in command and "file_backup" in command
-    assert "--agent" in command and "fault_typed_harness" in command
+    assert "--agent" in command and "fault-typed-harness" in command
     assert "local_llama_cpp/qwen-local" in command
     assert not any("timeout" in argument.lower() for argument in command)
 
