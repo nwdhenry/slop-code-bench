@@ -1,0 +1,12 @@
+agent: fault-typed-harness
+environment: local-py
+prompt: just-solve
+model:
+  provider: local_llama_cpp
+  name: qwen-local
+thinking: none
+pass_policy: any
+problems:
+  - file_backup
+save_dir: benchmark-output
+save_template: file-backup-baseline-v0
