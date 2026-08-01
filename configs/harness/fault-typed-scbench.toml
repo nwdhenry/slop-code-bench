@@ -1,0 +1,74 @@
+[model]
+base_url = "http://127.0.0.1:11434"
+model = "qwen3.6-27b-100k"
+context_limit = 100000
+temperature = 0.0
+seed = 7
+timeout_seconds = 0
+max_tokens = 2048
+
+[model.chat_template_kwargs]
+enable_thinking = false
+
+[policy]
+allowed_executables = ["python", "ruff"]
+allowed_argv_prefixes = [
+  ["python", "-m", "pytest"],
+  ["python", "-m", "compileall"],
+  ["ruff", "format", "--check"],
+  ["ruff", "check"],
+]
+denied_arguments = ["--exec-path", "-c"]
+max_command_seconds = 60.0
+max_output_bytes = 200000
+allow_network = false
+
+[workspace]
+ignore = [
+  ".git",
+  ".agent-harness",
+  ".evaluation_tests",
+  ".venv",
+  "__pycache__",
+  ".pytest_cache",
+  ".ruff_cache",
+]
+test_patterns = ["tests/**", "**/test_*.py"]
+max_read_bytes = 100000
+max_search_matches = 100
+
+[workflow]
+max_stage_attempts = 4
+max_review_cycles = 3
+max_model_turns_per_stage = 10
+require_red = true
+require_clean_workspace_on_resume = true
+determinism_repetitions = 1
+
+[[validation.commands]]
+name = "agent-tests"
+kind = "unit"
+argv = ["python", "-m", "pytest", "-q"]
+mandatory = true
+timeout_seconds = 60.0
+
+[[validation.commands]]
+name = "python-compilation"
+kind = "type"
+argv = ["python", "-m", "compileall", "-q", "."]
+mandatory = true
+timeout_seconds = 60.0
+
+[[validation.commands]]
+name = "ruff-format"
+kind = "format"
+argv = ["ruff", "format", "--check", "."]
+mandatory = true
+timeout_seconds = 60.0
+
+[[validation.commands]]
+name = "ruff-lint"
+kind = "lint"
+argv = ["ruff", "check", "."]
+mandatory = true
+timeout_seconds = 60.0

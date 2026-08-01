@@ -1,0 +1,7 @@
+internal_name: qwen3.6-27b-100k
+provider: local_llama_cpp
+pricing:
+  input: 0
+  output: 0
+  cache_read: 0
+  cache_write: 0

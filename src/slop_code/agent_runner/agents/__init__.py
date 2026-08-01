@@ -13,6 +13,12 @@ from slop_code.agent_runner.agents.codex import CodexAgent
 from slop_code.agent_runner.agents.codex import CodexConfig
 from slop_code.agent_runner.agents.cursor_cli import CursorCliAgent
 from slop_code.agent_runner.agents.cursor_cli import CursorCliConfig
+from slop_code.agent_runner.agents.fault_typed_harness import (
+    FaultTypedHarnessAgent,
+)
+from slop_code.agent_runner.agents.fault_typed_harness import (
+    FaultTypedHarnessConfig,
+)
 from slop_code.agent_runner.agents.gemini import GeminiAgent
 from slop_code.agent_runner.agents.gemini import GeminiConfig
 from slop_code.agent_runner.agents.kimi_cli import KimiCliAgent
@@ -43,6 +49,8 @@ __all__ = [
     "CodexConfig",
     "CursorCliAgent",
     "CursorCliConfig",
+    "FaultTypedHarnessAgent",
+    "FaultTypedHarnessConfig",
     "GeminiAgent",
     "GeminiConfig",
     "KimiCliAgent",

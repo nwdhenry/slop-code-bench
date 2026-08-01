@@ -21,6 +21,11 @@ providers:
     env_var: OPENAI_API_KEY
     description: OpenAI API key
 
+  local_llama_cpp:
+    type: env_var
+    env_var: LOCAL_LLAMA_CPP_READY
+    description: Local llama.cpp readiness sentinel; the native harness owns the connection
+
   cursor:
     type: env_var
     env_var: CURSOR_API_KEY

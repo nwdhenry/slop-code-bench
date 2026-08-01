@@ -1,0 +1,10 @@
+type: fault_typed_harness
+harness_config: configs/harness/fault-typed-scbench.toml
+run_root: benchmark-output/file-backup-baseline-v0
+copy_full_run: true
+require_model_match: true
+cost_limits:
+  cost_limit: 0
+  step_limit: 0
+  net_cost_limit: 0
+  max_retries: 0
