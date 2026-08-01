@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 from slop_code.fault_typed_campaign import run_campaign
 
@@ -14,6 +15,7 @@ def main() -> None:
     parser.add_argument("--repetitions", required=True, type=int)
     parser.add_argument("--agent", required=True)
     parser.add_argument("--model", required=True)
+    parser.add_argument("--output-root", type=Path)
     arguments = parser.parse_args()
     result = run_campaign(
         campaign=arguments.campaign,
@@ -21,6 +23,7 @@ def main() -> None:
         repetitions=arguments.repetitions,
         agent=arguments.agent,
         model=arguments.model,
+        output_root=arguments.output_root,
     )
     summary = result["summary"]
     print(
