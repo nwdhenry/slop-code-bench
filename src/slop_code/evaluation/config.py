@@ -855,7 +855,7 @@ class ProblemConfig(BaseConfig):
                 f"Expected spec file at problem root: {checkpoint_name}.md"
             )
 
-        return spec_file.read_text()
+        return spec_file.read_text(encoding="utf-8")
 
 
 def get_available_problems(problems_path: Path) -> dict[str, ProblemConfig]:

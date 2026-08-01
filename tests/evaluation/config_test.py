@@ -189,6 +189,26 @@ class TestProblemConfigTestDependencies:
         )
         assert config.test_dependencies == []
 
+    def test_checkpoint_spec_is_read_as_utf8(self, tmp_path: Path) -> None:
+        """Checkpoint specifications are UTF-8 independent of host locale."""
+        expected = "Preserve files — including naïve names and ✅ markers."
+        (tmp_path / "checkpoint_1.md").write_text(expected, encoding="utf-8")
+        config = ProblemConfig(
+            name="test",
+            path=tmp_path,
+            version=1,
+            description="Test problem",
+            entry_file="main.py",
+            tags=["test"],
+            checkpoints={
+                "checkpoint_1": CheckpointConfig(
+                    name="checkpoint_1", version=1, order=1
+                )
+            },
+        )
+
+        assert config.get_checkpoint_spec("checkpoint_1") == expected
+
     def test_test_dependencies_accepts_list(self):
         """test_dependencies should accept a list of strings."""
         config = ProblemConfig(
