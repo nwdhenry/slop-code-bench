@@ -35,8 +35,8 @@ correctness.
 | M20 Isolation and leakage | Complete | `0c66365` | external-root enforcement, byte-exact tasks, source manifests, forbidden-file detection |
 | M21 End-to-end qualification | Complete | `7720885`, `0e9ab98`, `bb09fbd`, `30da38e`, `d58777a`, `7c83b28`, `9188c39` | deterministic fixture plus natural four-checkpoint Qwen qualification; 0/4 external pass, 4 clean BLOCKED outcomes, no integrity hard failures |
 | M22 Campaign runner | Complete | `64690c2` | unattended repetition, fixed seed schedule, failure continuation, immutable treatment and result fingerprints |
-| M23 Five-run baseline | Pending | Pending | all five sessions retained and reported without treatment changes or selection |
-| M24 Prompt evaluation loop | Pending | Pending | first single-variable hypothesis and treatment contract after baseline review |
+| M23 Five-run baseline | Complete | Pending ledger commit | five immutable sessions retained; 0/5 full success, 0/20 checkpoint pass, 0 integrity failures; partial infrastructure evidence reconstructed without reruns |
+| M24 Prompt evaluation loop | Planned | Pending | repository-inspection contract hypothesis recorded; execution gated on post-baseline infrastructure qualification |
 | M25 Harness design evaluation | Pending | Pending | controlled design-condition scaffold; no premature ablation claim |
 | M26 Suite expansion | Pending | Pending | deferred until `file_backup` adapter reliability is demonstrated |
 

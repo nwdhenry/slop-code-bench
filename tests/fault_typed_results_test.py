@@ -171,3 +171,60 @@ def test_collector_marks_missing_prompt_fingerprint_as_hard_failure(
     integrity = combined["checkpoints"][0]["integrity"]
     assert integrity["missing_prompt_fingerprint"] == 1
     assert integrity["hard_failure"]
+
+
+def test_collector_retains_partial_infrastructure_checkpoint(
+    tmp_path: Path,
+) -> None:
+    session = tmp_path / "session"
+    problem = session / "scbench" / "file_backup"
+    problem.mkdir(parents=True)
+    (problem / "problem.yaml").write_text(
+        "checkpoints:\n  checkpoint_1: {}\n  checkpoint_2: {}\n",
+        encoding="utf-8",
+    )
+    checkpoint = problem / "checkpoint_1"
+    checkpoint.mkdir()
+    (checkpoint / "prompt.txt").write_text("exact task", encoding="utf-8")
+    harness = session / "checkpoint-1" / "harness-runs" / "run_partial"
+    harness.mkdir(parents=True)
+    state = {
+        "run_id": "run-partial",
+        "status": "RUNNING",
+        "current_state": "PLAN",
+        "reentry": {
+            "accepted_checkpoint_id": "checkpoint-initial",
+            "fault_records": {
+                "fault-1": {
+                    "fault_type": "INFRASTRUCTURE_FAILURE",
+                    "occurrences": 1,
+                    "status": "OPEN",
+                }
+            },
+        },
+    }
+    (harness / "state.json").write_text(json.dumps(state), encoding="utf-8")
+    events = [
+        {
+            "run_id": "run-partial",
+            "event_type": "MODEL_PROMPT",
+            "stage": "PLAN",
+            "prompt_fingerprint": "prompt-partial",
+        }
+    ]
+    (harness / "events.jsonl").write_text(
+        json.dumps(events[0]) + "\n", encoding="utf-8"
+    )
+
+    combined = collect_fault_typed_results(problem)
+
+    first, second = combined["checkpoints"]
+    assert first["internal"]["harness_terminal_status"] == (
+        "INFRASTRUCTURE_FAILURE"
+    )
+    assert first["internal"]["accepted_checkpoint"] == "checkpoint-initial"
+    assert first["external"]["infrastructure_failure"]
+    assert not first["integrity"]["hard_failure"]
+    assert second["internal"]["harness_terminal_status"] == "NOT_RUN"
+    assert second["external"]["infrastructure_failure"]
+    assert not second["integrity"]["hard_failure"]

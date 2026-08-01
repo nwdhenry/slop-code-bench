@@ -151,6 +151,44 @@ def run_campaign(
     return manifest
 
 
+def recollect_campaign(root: Path) -> dict[str, Any]:
+    """Rebuild campaign aggregates from immutable persisted session evidence."""
+    campaign_root = root.resolve()
+    manifest_path = campaign_root / "campaign.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict):
+        raise ValueError(f"Campaign manifest is not an object: {manifest_path}")
+    problem = str(manifest["problem"])
+    for session in manifest["sessions"]:
+        session_id = str(session["session_id"])
+        problem_dir = campaign_root / session_id / "scbench" / problem
+        try:
+            combined = collect_fault_typed_results(problem_dir)
+        except Exception as exc:  # noqa: BLE001
+            session["collection_error"] = f"{type(exc).__name__}: {exc}"
+            continue
+        prior_error = session.get("error")
+        if prior_error:
+            session["prior_collection_error"] = prior_error
+        session["error"] = None
+        session["collection_error"] = None
+        session["result"] = str(
+            (problem_dir / "combined-results.json").relative_to(campaign_root)
+        ).replace("\\", "/")
+        session["all_checkpoints_passed"] = combined["session"][
+            "all_checkpoints_passed"
+        ]
+        session["integrity_hard_failure"] = combined["integrity_hard_failure"]
+    summary = _campaign_summary(campaign_root, manifest)
+    manifest["summary"] = summary
+    _write_json(manifest_path, manifest)
+    _write_json(campaign_root / "campaign-results.json", summary)
+    (campaign_root / "campaign-summary.md").write_text(
+        _render_campaign_summary(manifest), encoding="utf-8", newline="\n"
+    )
+    return manifest
+
+
 def _scbench_command(
     *,
     session_root: Path,

@@ -2,9 +2,15 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
+from slop_code import fault_typed_campaign
 from slop_code.fault_typed_campaign import _campaign_summary
 from slop_code.fault_typed_campaign import _scbench_command
+from slop_code.fault_typed_campaign import recollect_campaign
+
+if TYPE_CHECKING:
+    import pytest
 
 
 def _combined(*, all_passed: bool, fault_type: str | None) -> dict:
@@ -93,3 +99,45 @@ def test_campaign_summary_retains_successes_and_failures(
     assert summary["terminal_failure_clusters"] == {"PATCH_REJECTED": 1}
     assert summary["tokens_per_checkpoint"] == 110
     assert summary["tokens_per_successful_session"] == 110
+
+
+def test_recollect_campaign_recovers_prior_collection_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    session_id = "campaign-r01-seed7"
+    manifest: dict[str, Any] = {
+        "campaign_id": "campaign",
+        "problem": "file_backup",
+        "repetitions": 1,
+        "treatment": {"fingerprint": "frozen"},
+        "sessions": [
+            {
+                "session_id": session_id,
+                "exit_code": 0,
+                "error": "missing adapter result",
+            }
+        ],
+    }
+    (tmp_path / "campaign.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+
+    def fake_collect(problem_dir: Path) -> dict[str, Any]:
+        combined = _combined(all_passed=False, fault_type="INFRA")
+        problem_dir.mkdir(parents=True)
+        (problem_dir / "combined-results.json").write_text(
+            json.dumps(combined), encoding="utf-8"
+        )
+        return combined
+
+    monkeypatch.setattr(
+        fault_typed_campaign, "collect_fault_typed_results", fake_collect
+    )
+
+    result = recollect_campaign(tmp_path)
+
+    session = result["sessions"][0]
+    assert session["error"] is None
+    assert session["prior_collection_error"] == "missing adapter result"
+    assert session["result"].endswith("combined-results.json")
+    assert result["summary"]["sessions_with_results"] == 1
