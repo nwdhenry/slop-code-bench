@@ -33,7 +33,7 @@ correctness.
 | M18 Freeze and integration scaffold | Complete | `c0fdc73` | pinned revisions, Python 3.12 uv environment, local model/config dry-run, frozen harness suite: 132 passed and 1 skipped |
 | M19 Native SCBench adapter | Complete | `c0fdc73` | registration, construction, lifecycle, usage, COMPLETE/BLOCKED, self-contained export |
 | M20 Isolation and leakage | Complete | `0c66365` | external-root enforcement, byte-exact tasks, source manifests, forbidden-file detection |
-| M21 End-to-end qualification | In progress | `7720885`, `0e9ab98`, `bb09fbd` | deterministic four-checkpoint fixture and combined scorecard pass; natural local-Qwen `file_backup` qualification pending |
+| M21 End-to-end qualification | Complete | `7720885`, `0e9ab98`, `bb09fbd`, `30da38e`, `d58777a`, `7c83b28`, `9188c39` | deterministic fixture plus natural four-checkpoint Qwen qualification; 0/4 external pass, 4 clean BLOCKED outcomes, no integrity hard failures |
 | M22 Campaign runner | Complete | `64690c2` | unattended repetition, fixed seed schedule, failure continuation, immutable treatment and result fingerprints |
 | M23 Five-run baseline | Pending | Pending | all five sessions retained and reported without treatment changes or selection |
 | M24 Prompt evaluation loop | Pending | Pending | first single-variable hypothesis and treatment contract after baseline review |
