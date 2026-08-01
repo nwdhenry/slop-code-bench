@@ -90,9 +90,13 @@ def _write_checkpoint(
             "stage": "IMPLEMENT",
         },
         {
-            "event_type": "MODEL_RESPONSE",
+            "event_type": "MODEL_PROMPT",
             "stage": "IMPLEMENT",
             "prompt_fingerprint": prompt_fingerprint,
+        },
+        {
+            "event_type": "MODEL_RESPONSE",
+            "stage": "IMPLEMENT",
             "payload_ref": f"sha256:{digest}",
         },
         {

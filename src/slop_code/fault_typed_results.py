@@ -153,11 +153,11 @@ def _integrity_metrics(
         for item in after
         if isinstance(item, dict) and item.get("classification") == "forbidden"
     )
-    model_events = [
-        event for event in events if event.get("event_type") == "MODEL_RESPONSE"
+    prompt_events = [
+        event for event in events if event.get("event_type") == "MODEL_PROMPT"
     ]
     missing_prompt_fingerprints = sum(
-        1 for event in model_events if not event.get("prompt_fingerprint")
+        1 for event in prompt_events if not event.get("prompt_fingerprint")
     )
     values = {
         "accepted_checkpoint_contamination": event_types[
