@@ -10,6 +10,13 @@
 #   3. For file: specify file_path field
 
 providers:
+  # The operator's local llama.cpp router. It takes no key; the variable states
+  # that the operator has the server running.
+  local_llama_cpp:
+    type: env_var
+    env_var: LOCAL_LLAMA_CPP_READY
+    description: Local llama.cpp router readiness flag
+
   # Environment variable providers
   anthropic:
     type: env_var

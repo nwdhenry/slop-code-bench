@@ -1,0 +1,14 @@
+# Agent config for the KLUDGE SWE flow.
+# The model is named by --model; the binding is the local OpenAI-compatible
+# router unless a campaign cell overrides `backend`, `endpoint`, and
+# `data_collection`. An OpenRouter binding that states no `data_collection` is
+# refused at configuration.
+type: kludge
+version: "0.1.0"
+run_root: .kludge-runs
+endpoint: http://127.0.0.1:11434
+backend: kludge.openai_compat@1
+cost_limits:
+  cost_limit: 0
+  step_limit: 0
+  net_cost_limit: 0

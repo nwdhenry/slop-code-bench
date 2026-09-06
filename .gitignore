@@ -225,3 +225,6 @@ dashboard/*.py[cod]
 .pi/*
 tmp/*
 reports/*
+
+# KLUDGE agent run directories: evidence of a run, never source.
+.kludge-runs/

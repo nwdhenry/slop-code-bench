@@ -13,13 +13,31 @@ tests score.
 
 The adapter calls published KLUDGE distributions and no private module of that
 repository: `kludge`, `kludge-api`, `kludge-swe`, `kludge-adapter-filetree`, the
-two backend adapters, and `kludge-metrics` for usage. The pin those path
-dependencies resolve to is in this branch's `pyproject.toml`.
+two backend adapters, and `kludge-metrics` for usage. The revision those
+dependencies are pinned to is in this branch's `pyproject.toml`.
+
+**What follows the reference adapter.** `feat/fault-typed-harness-agent` on this
+fork is the working reference at the same upstream pin, and this adapter mirrors
+it where the harness contract is the same: it takes a manifest of the submission
+tree before and after each checkpoint and records both identities; it raises
+`AgentError` rather than returning quietly when a checkpoint produced no
+admissible result; it reports usage from the run's own persisted records; and it
+keeps its evidence outside the submission workspace, copying it in through
+`save_artifacts`.
+
+**What is treatment-specific.** The reference hands the submission workspace to
+its own loop and edits it in place. A KLUDGE run owns a run directory and a
+workspace domain beneath it, so this adapter seeds that workspace from the
+submission tree, runs the kernel, and mirrors the accepted tree back —
+additions, changes, and deletions alike. That copy is the treatment's shape and
+no deviation from the harness contract; the manifests either side of it are what
+make the copy checkable.
 """
 
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import shutil
 from pathlib import Path
 from typing import Any, Literal
@@ -57,6 +75,17 @@ AGENT_VERSION = "0.1.0"
 the loop below is a change to what ran, so a campaign records it."""
 
 ACCEPTED = "accepted"
+STEP_BUDGET = 15
+ATTEMPT_BUDGET = 3
+STAGE_ENTRY_BUDGET = 1
+IMPLEMENT_ENTRY_BUDGET = 2
+"""The SWE flow's own declared budgets, recorded here so a campaign freezes the
+numbers its runs were bound by. This adapter sets none of its own.
+`docs/evidence/swe-live-1` of the KLUDGE repository established the step and
+attempt values — its implement attempts reached a proposal at steps 15, 15, and
+12, the accepted one on the third attempt — and
+`docs/evidence/quixbugs-campaign-1` is the campaign that produced accepted trees
+under them."""
 RUN_ID = "scbench"
 DEFAULT_ENDPOINT = "http://127.0.0.1:11434"
 DEFAULT_BACKEND = "kludge.openai_compat@1"
@@ -79,6 +108,7 @@ class KludgeConfig(AgentConfigBase, agent_type=AGENT_NAME):
     endpoint: str = DEFAULT_ENDPOINT
     backend: str = DEFAULT_BACKEND
     data_collection: str | None = None
+    wall_time_bound_s: int = 1800
 
 
 class KludgeAgent(Agent):
@@ -96,6 +126,7 @@ class KludgeAgent(Agent):
         backend: str,
         model: str,
         data_collection: str | None,
+        wall_time_bound_s: int,
     ) -> None:
         super().__init__(
             agent_name=AGENT_NAME,
@@ -110,10 +141,12 @@ class KludgeAgent(Agent):
         self.backend = backend
         self.model = model
         self.data_collection = data_collection
+        self.wall_time_bound_s = wall_time_bound_s
         self._session: Session | None = None
         self.checkpoint_sequence = 0
         self.last_run_directory: Path | None = None
         self.last_terminal: str | None = None
+        self.last_manifests: dict[str, str] = {}
 
     @classmethod
     def _from_config(
@@ -146,6 +179,7 @@ class KludgeAgent(Agent):
             backend=config.backend,
             model=model.internal_name or model.name,
             data_collection=config.data_collection,
+            wall_time_bound_s=config.wall_time_bound_s,
         )
 
     def identity(self) -> dict[str, Any]:
@@ -157,6 +191,14 @@ class KludgeAgent(Agent):
             "endpoint": self.endpoint,
             "model": self.model,
             "flow": "kludge_swe.flow.swe_flow",
+            "budgets": {
+                "max_steps_per_attempt": STEP_BUDGET,
+                "max_attempts_per_entry": ATTEMPT_BUDGET,
+                "stage_entries_per_run": STAGE_ENTRY_BUDGET,
+                "implement_entries_per_run": IMPLEMENT_ENTRY_BUDGET,
+                "source": "the declared constants of kludge_swe.flow",
+            },
+            "wall_time_bound_s": self.wall_time_bound_s,
         }
         if self.backend == OPENROUTER_BACKEND:
             record[RETENTION_PARAMETER] = self.data_collection
@@ -205,43 +247,105 @@ class KludgeAgent(Agent):
             environment=environment,
         )
         backend = self._backend()
+        before = _manifest(workspace_source)
         outcome = asyncio.run(
-            run(
-                flow,
-                run_dir=run_dir,
-                clock=LogicalClock(),
-                implementations=implementations_of(flow),
-                run_inputs={"task": swe_domain.item_task(task, None)},
-                domains={swe_domain.WORKSPACE: workspace},
-                backends={IMPLEMENTER: backend, VERIFIER: backend},
+            self._bounded(
+                run(
+                    flow,
+                    run_dir=run_dir,
+                    clock=LogicalClock(),
+                    implementations=implementations_of(flow),
+                    run_inputs={"task": swe_domain.item_task(task, None)},
+                    domains={swe_domain.WORKSPACE: workspace},
+                    backends={IMPLEMENTER: backend, VERIFIER: backend},
+                )
             )
         )
         self.last_run_directory = root
         self.last_terminal = outcome.terminal_state
         self._publish(root, workspace_source)
         self._record_usage(root)
+        self.last_manifests = {
+            "before": _identity(before),
+            "after": _identity(_manifest(workspace_source)),
+        }
+        if not outcome.succeeded:
+            raise AgentError(
+                f"the KLUDGE run of {self.problem_name} checkpoint "
+                f"{self.checkpoint_sequence} reached no accepted terminal: "
+                f"{outcome.cause.kind.name} at {outcome.terminal_state!r} — "
+                f"{outcome.cause.detail}"
+            )
+
+    async def _bounded(self, coroutine: Any) -> Any:
+        """Await one kernel run under this checkpoint's wall-time bound.
+
+        The bound is the harness-side one: `asyncio.wait_for` cancels the run's
+        task at it and this adapter reports the cancellation to the harness as an
+        agent error, so a checkpoint that hung is a recorded failure and never a
+        silent pass. It is the adapter's bound and not the kernel's own
+        cancellation protocol, which lives in the KLUDGE repository's own runner.
+        """
+        try:
+            return await asyncio.wait_for(coroutine, self.wall_time_bound_s)
+        except TimeoutError as expired:
+            raise AgentError(
+                f"the KLUDGE run of {self.problem_name} checkpoint "
+                f"{self.checkpoint_sequence} passed its "
+                f"{self.wall_time_bound_s}s wall-time bound and was cancelled"
+            ) from expired
 
     def _publish(self, root: Path, destination: Path) -> None:
-        """Copy the accepted tree into the workspace SCBench evaluates.
+        """Mirror the accepted tree into the workspace SCBench evaluates.
 
-        The accepted tree is what the kernel admitted. Every other path of the
-        run directory is KLUDGE evidence and stays out of the workspace.
+        The accepted tree is what the kernel admitted, and the submission tree is
+        made to equal it: a file the flow added or changed is written, and a file
+        the flow removed is removed here too. A copy-only publish would leave a
+        deleted file standing in the tree the hidden tests score, which is a
+        result the run did not produce.
+
+        Every other path of the run directory is KLUDGE evidence and stays out of
+        the workspace.
         """
         accepted = root / WORKSPACE_DIR / ACCEPTED
         if not accepted.is_dir():
-            return
+            raise AgentError(
+                f"the KLUDGE run of {self.problem_name} left no accepted tree at "
+                f"{accepted}; nothing was published to the submission workspace"
+            )
+        kept = set()
         for path in sorted(accepted.rglob("*")):
             if "__pycache__" in path.parts:
                 continue
-            target = destination / path.relative_to(accepted)
+            relative = path.relative_to(accepted)
+            kept.add(relative)
+            target = destination / relative
             if path.is_dir():
                 target.mkdir(parents=True, exist_ok=True)
             else:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy(path, target)
+        for path in sorted(destination.rglob("*"), reverse=True):
+            if "__pycache__" in path.parts:
+                continue
+            if path.relative_to(destination) in kept:
+                continue
+            if path.is_file():
+                path.unlink()
+            elif path.is_dir() and not any(path.iterdir()):
+                path.rmdir()
 
     def _record_usage(self, root: Path) -> None:
-        """Record what the run spent, reading the run's own persisted records."""
+        """Record what the run spent, reading the run's own persisted records.
+
+        Cost is left to the harness's own pricing. This adapter reports token
+        counts and steps and prices nothing: a zero it wrote would read as a
+        measured cost of nothing, and an unpriced run has an unknown cost and
+        never a zero one.
+
+        Steps accumulate across the checkpoint rather than replacing the count,
+        so a checkpoint that ran more than one kernel run reports what it spent.
+        """
         summary = summarize(root)
         totals = next(iter(summary.usage), None)
         tokens = TokenUsage(
@@ -249,8 +353,9 @@ class KludgeAgent(Agent):
             output=int(totals.output_tokens or 0) if totals else 0,
             reasoning=int(totals.reasoning_output_tokens or 0) if totals else 0,
         )
-        self.usage.step(cost=0.0, tokens=tokens)
-        self.usage.steps = summary.step_count
+        priced = self.pricing.get_cost(tokens) if self.pricing else 0.0
+        self.usage.step(cost=priced, tokens=tokens)
+        self.usage.steps += summary.step_count
 
     def reset(self) -> None:
         """Clear per-checkpoint state.
@@ -261,6 +366,7 @@ class KludgeAgent(Agent):
         """
         self.last_run_directory = None
         self.last_terminal = None
+        self.last_manifests = {}
 
     def save_artifacts(self, path: Path) -> None:
         """Copy this checkpoint's KLUDGE run directory into the artifacts path."""
@@ -278,6 +384,23 @@ class KludgeAgent(Agent):
     def cleanup(self) -> None:
         """Release the session reference. The run root is retained evidence."""
         self._session = None
+
+
+def _manifest(root: Path) -> list[tuple[str, str]]:
+    """Return one entry per file of a tree: its path and the digest of its bytes."""
+    entries = []
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or "__pycache__" in path.parts:
+            continue
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        entries.append((path.relative_to(root).as_posix(), digest))
+    return entries
+
+
+def _identity(manifest: list[tuple[str, str]]) -> str:
+    """Return one digest over a whole tree manifest."""
+    joined = "\n".join(f"{name} {digest}" for name, digest in manifest)
+    return "sha256:" + hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
 
 register_agent(AGENT_NAME, KludgeAgent)

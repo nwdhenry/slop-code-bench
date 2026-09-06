@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 
 import pytest
@@ -7,8 +8,10 @@ import pytest
 from slop_code.agent_runner.agent import Agent
 from slop_code.agent_runner.agents.kludge import AGENT_NAME
 from slop_code.agent_runner.agents.kludge import AGENT_VERSION
+from slop_code.agent_runner.agents.kludge import ATTEMPT_BUDGET
 from slop_code.agent_runner.agents.kludge import OPENROUTER_BACKEND
 from slop_code.agent_runner.agents.kludge import RETENTION_PARAMETER
+from slop_code.agent_runner.agents.kludge import STEP_BUDGET
 from slop_code.agent_runner.agents.kludge import KludgeAgent
 from slop_code.agent_runner.agents.kludge import KludgeConfig
 from slop_code.agent_runner.credentials import CredentialType
@@ -209,3 +212,65 @@ def test_cleanup_releases_the_session(tmp_path: Path) -> None:
     agent.cleanup()
 
     assert agent._session is None
+
+
+def test_publishing_removes_what_the_flow_removed(tmp_path: Path) -> None:
+    agent = _agent(tmp_path)
+    root = tmp_path / "run"
+    accepted = root / "workspace" / "accepted"
+    accepted.mkdir(parents=True)
+    (accepted / "entry.py").write_text("print('ok')\n", encoding="utf-8")
+    destination = tmp_path / "submission"
+    (destination / "stale").mkdir(parents=True)
+    (destination / "stale" / "old.py").write_text("gone\n", encoding="utf-8")
+    (destination / "entry.py").write_text("old\n", encoding="utf-8")
+
+    agent._publish(root, destination)
+
+    assert (destination / "entry.py").read_text(
+        encoding="utf-8"
+    ) == "print('ok')\n"
+    assert not (destination / "stale" / "old.py").exists()
+    assert not (destination / "stale").exists()
+
+
+def test_publishing_without_an_accepted_tree_is_refused(tmp_path: Path) -> None:
+    agent = _agent(tmp_path)
+    root = tmp_path / "run"
+    root.mkdir()
+
+    with pytest.raises(AgentError, match="no accepted tree"):
+        agent._publish(root, tmp_path / "submission")
+
+
+def test_the_identity_states_the_flow_budgets_and_the_wall_bound(
+    tmp_path: Path,
+) -> None:
+    agent = _agent(tmp_path)
+
+    identity = agent.identity()
+
+    assert identity["budgets"]["max_steps_per_attempt"] == STEP_BUDGET
+    assert identity["budgets"]["max_attempts_per_entry"] == ATTEMPT_BUDGET
+    assert identity["wall_time_bound_s"] == 1800
+
+
+def test_a_run_that_passes_its_wall_bound_is_an_agent_error(
+    tmp_path: Path,
+) -> None:
+    agent = _agent(tmp_path, wall_time_bound_s=1)
+
+    async def _forever() -> None:
+        await asyncio.sleep(30)
+
+    with pytest.raises(AgentError, match="wall-time bound"):
+        asyncio.run(agent._bounded(_forever()))
+
+
+def test_usage_accumulates_steps_across_kernel_runs(tmp_path: Path) -> None:
+    agent = _agent(tmp_path)
+    agent.usage.steps = 4
+
+    agent.usage.steps += 7
+
+    assert agent.usage.steps == 11
