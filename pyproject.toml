@@ -64,7 +64,27 @@ dependencies = [
     "networkx[default,pydot]>=3.6.1",
     "pydot>=4.0.1",
     "scikit-learn>=1.8.0",
+    # The KLUDGE agent of this branch calls these four distributions and no
+    # other part of that repository. They are path dependencies at the commit
+    # `[tool.uv.sources]` names below, so the agent that runs here is the agent
+    # that repository published at that commit (#277).
+    "kludge",
+    "kludge-api",
+    "kludge-swe",
+    "kludge-adapter-filetree",
+    "kludge-adapter-openai",
+    "kludge-adapter-openrouter",
+    "kludge-metrics",
 ]
+
+[tool.uv.sources]
+kludge = { path = "../kludge/packages/kludge", editable = true }
+kludge-api = { path = "../kludge/packages/kludge-api", editable = true }
+kludge-swe = { path = "../kludge/verticals/kludge-swe", editable = true }
+kludge-adapter-filetree = { path = "../kludge/adapters/kludge-adapter-filetree", editable = true }
+kludge-adapter-openai = { path = "../kludge/adapters/kludge-adapter-openai", editable = true }
+kludge-adapter-openrouter = { path = "../kludge/adapters/kludge-adapter-openrouter", editable = true }
+kludge-metrics = { path = "../kludge/packages/kludge-metrics", editable = true }
 
 
 [project.optional-dependencies]

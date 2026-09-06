@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -1153,17 +1153,17 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 dependencies = [
-    { name = "authlib", marker = "python_full_version < '3.14'" },
-    { name = "cyclopts", marker = "python_full_version < '3.14'" },
-    { name = "exceptiongroup", marker = "python_full_version < '3.14'" },
-    { name = "httpx", marker = "python_full_version < '3.14'" },
-    { name = "mcp", version = "1.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
-    { name = "openapi-core", marker = "python_full_version < '3.14'" },
-    { name = "openapi-pydantic", marker = "python_full_version < '3.14'" },
-    { name = "pydantic", extra = ["email"], marker = "python_full_version < '3.14'" },
-    { name = "pyperclip", marker = "python_full_version < '3.14'" },
-    { name = "python-dotenv", marker = "python_full_version < '3.14'" },
-    { name = "rich", marker = "python_full_version < '3.14'" },
+    { name = "authlib" },
+    { name = "cyclopts" },
+    { name = "exceptiongroup" },
+    { name = "httpx" },
+    { name = "mcp", version = "1.16.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "openapi-core" },
+    { name = "openapi-pydantic" },
+    { name = "pydantic", extra = ["email"] },
+    { name = "pyperclip" },
+    { name = "python-dotenv" },
+    { name = "rich" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/00/a6/e3b46cd3e228635e0064c2648788b6f66a53bf0d0ddbf5fb44cca951f908/fastmcp-2.12.5.tar.gz", hash = "sha256:2dfd02e255705a4afe43d26caddbc864563036e233dbc6870f389ee523b39a6a", size = 7190263, upload-time = "2025-10-17T13:24:58.896Z" }
 wheels = [
@@ -1178,20 +1178,20 @@ resolution-markers = [
     "python_full_version >= '3.14'",
 ]
 dependencies = [
-    { name = "authlib", marker = "python_full_version >= '3.14'" },
-    { name = "cyclopts", marker = "python_full_version >= '3.14'" },
-    { name = "exceptiongroup", marker = "python_full_version >= '3.14'" },
-    { name = "httpx", marker = "python_full_version >= '3.14'" },
-    { name = "jsonschema-path", marker = "python_full_version >= '3.14'" },
-    { name = "mcp", version = "1.20.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
-    { name = "openapi-pydantic", marker = "python_full_version >= '3.14'" },
-    { name = "platformdirs", marker = "python_full_version >= '3.14'" },
-    { name = "py-key-value-aio", extra = ["disk", "keyring", "memory"], marker = "python_full_version >= '3.14'" },
-    { name = "pydantic", extra = ["email"], marker = "python_full_version >= '3.14'" },
-    { name = "pyperclip", marker = "python_full_version >= '3.14'" },
-    { name = "python-dotenv", marker = "python_full_version >= '3.14'" },
-    { name = "rich", marker = "python_full_version >= '3.14'" },
-    { name = "websockets", marker = "python_full_version >= '3.14'" },
+    { name = "authlib" },
+    { name = "cyclopts" },
+    { name = "exceptiongroup" },
+    { name = "httpx" },
+    { name = "jsonschema-path" },
+    { name = "mcp", version = "1.20.0", source = { registry = "https://pypi.org/simple" } },
+    { name = "openapi-pydantic" },
+    { name = "platformdirs" },
+    { name = "py-key-value-aio", extra = ["disk", "keyring", "memory"] },
+    { name = "pydantic", extra = ["email"] },
+    { name = "pyperclip" },
+    { name = "python-dotenv" },
+    { name = "rich" },
+    { name = "websockets" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1b/74/584a152bcd174c99ddf3cfdd7e86ec4a6c696fb190a907c2a2ec9056bda2/fastmcp-2.13.0.2.tar.gz", hash = "sha256:d35386561b6f3cde195ba2b5892dc89b8919a721e6b39b98e7a16f9a7c0b8e8b", size = 7762083, upload-time = "2025-10-28T13:56:21.702Z" }
 wheels = [
@@ -1894,7 +1894,7 @@ name = "jaraco-classes"
 version = "3.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "more-itertools", marker = "python_full_version >= '3.14'" },
+    { name = "more-itertools" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/06/c0/ed4a27bc5571b99e3cff68f8a9fa5b56ff7df1c2251cc715a652ddd26402/jaraco.classes-3.4.0.tar.gz", hash = "sha256:47a024b51d0239c0dd8c8540c6c7f484be3b8fcf0b2d85c13825780d3b3f3acd", size = 11780, upload-time = "2024-03-31T07:27:36.643Z" }
 wheels = [
@@ -1915,7 +1915,7 @@ name = "jaraco-functools"
 version = "4.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "more-itertools", marker = "python_full_version >= '3.14'" },
+    { name = "more-itertools" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f7/ed/1aa2d585304ec07262e1a83a9889880701079dde796ac7b1d1826f40c63d/jaraco_functools-4.3.0.tar.gz", hash = "sha256:cfd13ad0dd2c47a3600b439ef72d8615d482cedcff1632930d6f28924d92f294", size = 19755, upload-time = "2025-08-18T20:05:09.91Z" }
 wheels = [
@@ -2313,12 +2313,12 @@ name = "keyring"
 version = "25.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "jaraco-classes", marker = "python_full_version >= '3.14'" },
-    { name = "jaraco-context", marker = "python_full_version >= '3.14'" },
-    { name = "jaraco-functools", marker = "python_full_version >= '3.14'" },
-    { name = "jeepney", marker = "python_full_version >= '3.14' and sys_platform == 'linux'" },
-    { name = "pywin32-ctypes", marker = "python_full_version >= '3.14' and sys_platform == 'win32'" },
-    { name = "secretstorage", marker = "python_full_version >= '3.14' and sys_platform == 'linux'" },
+    { name = "jaraco-classes" },
+    { name = "jaraco-context" },
+    { name = "jaraco-functools" },
+    { name = "jeepney", marker = "sys_platform == 'linux'" },
+    { name = "pywin32-ctypes", marker = "sys_platform == 'win32'" },
+    { name = "secretstorage", marker = "sys_platform == 'linux'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/70/09/d904a6e96f76ff214be59e7aa6ef7190008f52a0ab6689760a98de0bf37d/keyring-25.6.0.tar.gz", hash = "sha256:0b39998aa941431eb3d9b0d4b2460bc773b9df6fed7621c2dfb291a7e0187a66", size = 62750, upload-time = "2024-12-25T15:26:45.782Z" }
 wheels = [
@@ -2395,6 +2395,144 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/99/dd/841e9a66c4715477ea0abc78da039832fbb09dac5c35c58dc4c41a407b8a/kiwisolver-1.4.9-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:aedff62918805fb62d43a4aa2ecd4482c380dc76cd31bd7c8878588a61bd0369", size = 2391835, upload-time = "2025-08-10T21:27:34.23Z" },
     { url = "https://files.pythonhosted.org/packages/0c/28/4b2e5c47a0da96896fdfdb006340ade064afa1e63675d01ea5ac222b6d52/kiwisolver-1.4.9-cp314-cp314t-win_amd64.whl", hash = "sha256:1fa333e8b2ce4d9660f2cda9c0e1b6bafcfb2457a9d259faa82289e73ec24891", size = 79988, upload-time = "2025-08-10T21:27:35.587Z" },
     { url = "https://files.pythonhosted.org/packages/80/be/3578e8afd18c88cdf9cb4cffde75a96d2be38c5a903f1ed0ceec061bd09e/kiwisolver-1.4.9-cp314-cp314t-win_arm64.whl", hash = "sha256:4a48a2ce79d65d363597ef7b567ce3d14d68783d2b2263d98db3d9477805ba32", size = 70260, upload-time = "2025-08-10T21:27:36.606Z" },
+]
+
+[[package]]
+name = "kludge"
+version = "0.1.0a1"
+source = { editable = "../kludge/packages/kludge" }
+dependencies = [
+    { name = "kludge-api" },
+    { name = "kludge-metrics" },
+    { name = "kludge-resolve" },
+    { name = "kludge-ui" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "kludge-api", editable = "../kludge/packages/kludge-api" },
+    { name = "kludge-metrics", editable = "../kludge/packages/kludge-metrics" },
+    { name = "kludge-resolve", editable = "../kludge/packages/kludge-resolve" },
+    { name = "kludge-ui", editable = "../kludge/packages/kludge-ui" },
+]
+
+[[package]]
+name = "kludge-adapter-filetree"
+version = "0.1.0a1"
+source = { editable = "../kludge/adapters/kludge-adapter-filetree" }
+dependencies = [
+    { name = "kludge-api" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "kludge-api", editable = "../kludge/packages/kludge-api" }]
+
+[[package]]
+name = "kludge-adapter-openai"
+version = "0.1.0a1"
+source = { editable = "../kludge/adapters/kludge-adapter-openai" }
+dependencies = [
+    { name = "httpx" },
+    { name = "kludge-api" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.27,<0.29" },
+    { name = "kludge-api", editable = "../kludge/packages/kludge-api" },
+    { name = "pydantic", specifier = ">=2.8,<3" },
+]
+
+[[package]]
+name = "kludge-adapter-openrouter"
+version = "0.1.0a1"
+source = { editable = "../kludge/adapters/kludge-adapter-openrouter" }
+dependencies = [
+    { name = "httpx" },
+    { name = "kludge-api" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "httpx", specifier = ">=0.27,<0.29" },
+    { name = "kludge-api", editable = "../kludge/packages/kludge-api" },
+    { name = "pydantic", specifier = ">=2.8,<3" },
+]
+
+[[package]]
+name = "kludge-api"
+version = "0.1.0a1"
+source = { editable = "../kludge/packages/kludge-api" }
+
+[[package]]
+name = "kludge-metrics"
+version = "0.1.0a1"
+source = { editable = "../kludge/packages/kludge-metrics" }
+dependencies = [
+    { name = "kludge-api" },
+    { name = "kludge-resolve" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "kludge-api", editable = "../kludge/packages/kludge-api" },
+    { name = "kludge-resolve", editable = "../kludge/packages/kludge-resolve" },
+]
+
+[[package]]
+name = "kludge-resolve"
+version = "0.1.0a0"
+source = { editable = "../kludge/packages/kludge-resolve" }
+dependencies = [
+    { name = "kludge-api" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "kludge-api", editable = "../kludge/packages/kludge-api" }]
+
+[[package]]
+name = "kludge-shared"
+version = "0.1.0a1"
+source = { editable = "../kludge/shared/kludge-shared" }
+dependencies = [
+    { name = "kludge-api" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "kludge-api", editable = "../kludge/packages/kludge-api" }]
+
+[[package]]
+name = "kludge-swe"
+version = "0.1.0a1"
+source = { editable = "../kludge/verticals/kludge-swe" }
+dependencies = [
+    { name = "kludge-api" },
+    { name = "kludge-resolve" },
+    { name = "kludge-shared" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "kludge-api", editable = "../kludge/packages/kludge-api" },
+    { name = "kludge-resolve", editable = "../kludge/packages/kludge-resolve" },
+    { name = "kludge-shared", editable = "../kludge/shared/kludge-shared" },
+]
+
+[[package]]
+name = "kludge-ui"
+version = "0.1.0a0"
+source = { editable = "../kludge/packages/kludge-ui" }
+dependencies = [
+    { name = "kludge-api" },
+    { name = "kludge-metrics" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "kludge-api", editable = "../kludge/packages/kludge-api" },
+    { name = "kludge-metrics", editable = "../kludge/packages/kludge-metrics" },
 ]
 
 [[package]]
@@ -2738,17 +2876,17 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 dependencies = [
-    { name = "anyio", marker = "python_full_version < '3.14'" },
-    { name = "httpx", marker = "python_full_version < '3.14'" },
-    { name = "httpx-sse", marker = "python_full_version < '3.14'" },
-    { name = "jsonschema", marker = "python_full_version < '3.14'" },
-    { name = "pydantic", marker = "python_full_version < '3.14'" },
-    { name = "pydantic-settings", marker = "python_full_version < '3.14'" },
-    { name = "python-multipart", marker = "python_full_version < '3.14'" },
-    { name = "pywin32", marker = "python_full_version < '3.14' and sys_platform == 'win32'" },
-    { name = "sse-starlette", marker = "python_full_version < '3.14'" },
-    { name = "starlette", marker = "python_full_version < '3.14'" },
-    { name = "uvicorn", marker = "python_full_version < '3.14' and sys_platform != 'emscripten'" },
+    { name = "anyio" },
+    { name = "httpx" },
+    { name = "httpx-sse" },
+    { name = "jsonschema" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-multipart" },
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
+    { name = "sse-starlette" },
+    { name = "starlette" },
+    { name = "uvicorn", marker = "sys_platform != 'emscripten'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3d/a1/b1f328da3b153683d2ec34f849b4b6eac2790fb240e3aef06ff2fab3df9d/mcp-1.16.0.tar.gz", hash = "sha256:39b8ca25460c578ee2cdad33feeea122694cfdf73eef58bee76c42f6ef0589df", size = 472918, upload-time = "2025-10-02T16:58:20.631Z" }
 wheels = [
@@ -2763,18 +2901,18 @@ resolution-markers = [
     "python_full_version >= '3.14'",
 ]
 dependencies = [
-    { name = "anyio", marker = "python_full_version >= '3.14'" },
-    { name = "httpx", marker = "python_full_version >= '3.14'" },
-    { name = "httpx-sse", marker = "python_full_version >= '3.14'" },
-    { name = "jsonschema", marker = "python_full_version >= '3.14'" },
-    { name = "pydantic", marker = "python_full_version >= '3.14'" },
-    { name = "pydantic-settings", marker = "python_full_version >= '3.14'" },
-    { name = "pyjwt", extra = ["crypto"], marker = "python_full_version >= '3.14'" },
-    { name = "python-multipart", marker = "python_full_version >= '3.14'" },
-    { name = "pywin32", marker = "python_full_version >= '3.14' and sys_platform == 'win32'" },
-    { name = "sse-starlette", marker = "python_full_version >= '3.14'" },
-    { name = "starlette", marker = "python_full_version >= '3.14'" },
-    { name = "uvicorn", marker = "python_full_version >= '3.14' and sys_platform != 'emscripten'" },
+    { name = "anyio" },
+    { name = "httpx" },
+    { name = "httpx-sse" },
+    { name = "jsonschema" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "pyjwt", extra = ["crypto"] },
+    { name = "python-multipart" },
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
+    { name = "sse-starlette" },
+    { name = "starlette" },
+    { name = "uvicorn", marker = "sys_platform != 'emscripten'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f8/22/fae38092e6c2995c03232635028510d77e7decff31b4ae79dfa0ba99c635/mcp-1.20.0.tar.gz", hash = "sha256:9ccc09eaadbfbcbbdab1c9723cfe2e0d1d9e324d7d3ce7e332ef90b09ed35177", size = 451377, upload-time = "2025-10-30T22:14:53.421Z" }
 wheels = [
@@ -3239,15 +3377,15 @@ name = "openapi-core"
 version = "0.19.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "isodate", marker = "python_full_version < '3.14'" },
-    { name = "jsonschema", marker = "python_full_version < '3.14'" },
-    { name = "jsonschema-path", marker = "python_full_version < '3.14'" },
-    { name = "more-itertools", marker = "python_full_version < '3.14'" },
-    { name = "openapi-schema-validator", marker = "python_full_version < '3.14'" },
-    { name = "openapi-spec-validator", marker = "python_full_version < '3.14'" },
-    { name = "parse", marker = "python_full_version < '3.14'" },
-    { name = "typing-extensions", marker = "python_full_version < '3.14'" },
-    { name = "werkzeug", version = "3.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
+    { name = "isodate" },
+    { name = "jsonschema" },
+    { name = "jsonschema-path" },
+    { name = "more-itertools" },
+    { name = "openapi-schema-validator" },
+    { name = "openapi-spec-validator" },
+    { name = "parse" },
+    { name = "typing-extensions" },
+    { name = "werkzeug", version = "3.1.1", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b1/35/1acaa5f2fcc6e54eded34a2ec74b479439c4e469fc4e8d0e803fda0234db/openapi_core-0.19.5.tar.gz", hash = "sha256:421e753da56c391704454e66afe4803a290108590ac8fa6f4a4487f4ec11f2d3", size = 103264, upload-time = "2025-03-20T20:17:28.193Z" }
 wheels = [
@@ -3271,9 +3409,9 @@ name = "openapi-schema-validator"
 version = "0.6.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "jsonschema", marker = "python_full_version < '3.14'" },
-    { name = "jsonschema-specifications", marker = "python_full_version < '3.14'" },
-    { name = "rfc3339-validator", marker = "python_full_version < '3.14'" },
+    { name = "jsonschema" },
+    { name = "jsonschema-specifications" },
+    { name = "rfc3339-validator" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8b/f3/5507ad3325169347cd8ced61c232ff3df70e2b250c49f0fe140edb4973c6/openapi_schema_validator-0.6.3.tar.gz", hash = "sha256:f37bace4fc2a5d96692f4f8b31dc0f8d7400fd04f3a937798eaf880d425de6ee", size = 11550, upload-time = "2025-01-10T18:08:22.268Z" }
 wheels = [
@@ -3285,10 +3423,10 @@ name = "openapi-spec-validator"
 version = "0.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "jsonschema", marker = "python_full_version < '3.14'" },
-    { name = "jsonschema-path", marker = "python_full_version < '3.14'" },
-    { name = "lazy-object-proxy", marker = "python_full_version < '3.14'" },
-    { name = "openapi-schema-validator", marker = "python_full_version < '3.14'" },
+    { name = "jsonschema" },
+    { name = "jsonschema-path" },
+    { name = "lazy-object-proxy" },
+    { name = "openapi-schema-validator" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/82/af/fe2d7618d6eae6fb3a82766a44ed87cd8d6d82b4564ed1c7cfb0f6378e91/openapi_spec_validator-0.7.2.tar.gz", hash = "sha256:cc029309b5c5dbc7859df0372d55e9d1ff43e96d678b9ba087f7c56fc586f734", size = 36855, upload-time = "2025-06-07T14:48:56.299Z" }
 wheels = [
@@ -4019,8 +4157,8 @@ name = "py-key-value-aio"
 version = "0.2.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "beartype", marker = "python_full_version >= '3.14'" },
-    { name = "py-key-value-shared", marker = "python_full_version >= '3.14'" },
+    { name = "beartype" },
+    { name = "py-key-value-shared" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ca/35/65310a4818acec0f87a46e5565e341c5a96fc062a9a03495ad28828ff4d7/py_key_value_aio-0.2.8.tar.gz", hash = "sha256:c0cfbb0bd4e962a3fa1a9fa6db9ba9df812899bd9312fa6368aaea7b26008b36", size = 32853, upload-time = "2025-10-24T13:31:04.688Z" }
 wheels = [
@@ -4029,14 +4167,14 @@ wheels = [
 
 [package.optional-dependencies]
 disk = [
-    { name = "diskcache", marker = "python_full_version >= '3.14'" },
-    { name = "pathvalidate", marker = "python_full_version >= '3.14'" },
+    { name = "diskcache" },
+    { name = "pathvalidate" },
 ]
 keyring = [
-    { name = "keyring", marker = "python_full_version >= '3.14'" },
+    { name = "keyring" },
 ]
 memory = [
-    { name = "cachetools", version = "6.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
+    { name = "cachetools", version = "6.2.1", source = { registry = "https://pypi.org/simple" } },
 ]
 
 [[package]]
@@ -4044,8 +4182,8 @@ name = "py-key-value-shared"
 version = "0.2.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "beartype", marker = "python_full_version >= '3.14'" },
-    { name = "typing-extensions", marker = "python_full_version >= '3.14'" },
+    { name = "beartype" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/26/79/05a1f9280cfa0709479319cbfd2b1c5beb23d5034624f548c83fb65b0b61/py_key_value_shared-0.2.8.tar.gz", hash = "sha256:703b4d3c61af124f0d528ba85995c3c8d78f8bd3d2b217377bd3278598070cc1", size = 8216, upload-time = "2025-10-24T13:31:03.601Z" }
 wheels = [
@@ -4281,7 +4419,7 @@ wheels = [
 
 [package.optional-dependencies]
 crypto = [
-    { name = "cryptography", marker = "python_full_version >= '3.14'" },
+    { name = "cryptography" },
 ]
 
 [[package]]
@@ -7810,8 +7948,8 @@ name = "secretstorage"
 version = "3.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cryptography", marker = "python_full_version >= '3.14'" },
-    { name = "jeepney", marker = "python_full_version >= '3.14'" },
+    { name = "cryptography" },
+    { name = "jeepney" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/31/9f/11ef35cf1027c1339552ea7bfe6aaa74a8516d8b5caf6e7d338daf54fd80/secretstorage-3.4.0.tar.gz", hash = "sha256:c46e216d6815aff8a8a18706a2fbfd8d53fcbb0dce99301881687a1b0289ef7c", size = 19748, upload-time = "2025-09-09T16:42:13.859Z" }
 wheels = [
@@ -7947,6 +8085,13 @@ dependencies = [
     { name = "isort" },
     { name = "jupyter" },
     { name = "kaleido" },
+    { name = "kludge" },
+    { name = "kludge-adapter-filetree" },
+    { name = "kludge-adapter-openai" },
+    { name = "kludge-adapter-openrouter" },
+    { name = "kludge-api" },
+    { name = "kludge-metrics" },
+    { name = "kludge-swe" },
     { name = "litellm" },
     { name = "mini-swe-agent" },
     { name = "mypy" },
@@ -8034,6 +8179,13 @@ requires-dist = [
     { name = "isort", specifier = ">=6.0.1" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "kaleido", specifier = ">=1.2.0" },
+    { name = "kludge", editable = "../kludge/packages/kludge" },
+    { name = "kludge-adapter-filetree", editable = "../kludge/adapters/kludge-adapter-filetree" },
+    { name = "kludge-adapter-openai", editable = "../kludge/adapters/kludge-adapter-openai" },
+    { name = "kludge-adapter-openrouter", editable = "../kludge/adapters/kludge-adapter-openrouter" },
+    { name = "kludge-api", editable = "../kludge/packages/kludge-api" },
+    { name = "kludge-metrics", editable = "../kludge/packages/kludge-metrics" },
+    { name = "kludge-swe", editable = "../kludge/verticals/kludge-swe" },
     { name = "litellm", specifier = "<=1.82.6" },
     { name = "mini-swe-agent", specifier = ">=1.9.0" },
     { name = "mypy", specifier = ">=1.19.0" },
@@ -8493,6 +8645,14 @@ version = "0.23.1"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/22/85/a61c782afbb706a47d990eaee6977e7c2bd013771c5bf5c81c617684f286/tree_sitter_c_sharp-0.23.1.tar.gz", hash = "sha256:322e2cfd3a547a840375276b2aea3335fa6458aeac082f6c60fec3f745c967eb", size = 1317728, upload-time = "2024-11-11T05:25:32.535Z" }
 wheels = [
+    { url = "https://files.pythonhosted.org/packages/4c/dc/d4a0ad9e466263728f80f9dac399609473af01c1aba2ea3ea8879ce56276/tree_sitter_c_sharp-0.23.1-cp310-abi3-macosx_10_9_x86_64.whl", hash = "sha256:e87be7572991552606a3155d2f6c2045ded8bce94bfd9f74bf521d949c219a1c", size = 333661, upload-time = "2026-04-14T15:11:14.227Z" },
+    { url = "https://files.pythonhosted.org/packages/61/7a/5c862770460a2e27079e725585ad2718100373c09448c14e36934ef44414/tree_sitter_c_sharp-0.23.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:86c2fdf178c66474a1be2965602818d30780e4e3ed890e3c206931f65d9a154c", size = 376295, upload-time = "2026-04-14T15:11:15.346Z" },
+    { url = "https://files.pythonhosted.org/packages/67/18/0571a3a34c0feda60a9c37cf6dd5edfdbc24f8fcb1e48b6b6eb0f324ad2a/tree_sitter_c_sharp-0.23.1-cp310-abi3-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:035d259e64c41d02cc45afc3b8b46388b232e7d16d84734d851cca7334761da5", size = 358331, upload-time = "2026-04-14T15:11:16.418Z" },
+    { url = "https://files.pythonhosted.org/packages/44/65/0f7e1f50f6365338eb700f01710da0adc49a49fa9a8443e5a90ea4f29491/tree_sitter_c_sharp-0.23.1-cp310-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:fa472cb9de7e14fee9408e144f29f68384cd8e9c677dff0002da19f361a59bdf", size = 359444, upload-time = "2026-04-14T15:11:17.509Z" },
+    { url = "https://files.pythonhosted.org/packages/98/60/129bd56d5ef22b4ae254940a09b6d3ed873093218868a3f9635d571d514e/tree_sitter_c_sharp-0.23.1-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:1a0ea86eccff74e85ab4a2cf77c813fad7c84162962ce242dff0c51601028832", size = 358143, upload-time = "2026-04-14T15:11:18.755Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/cd/e12cdca47e0c56151cb4b156d48091b7bc1d968e072c1656cf6b73fe7218/tree_sitter_c_sharp-0.23.1-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:8ab26dc998bbd4b4287b129f67c10ca715deb402ed77d0645674490ea509097e", size = 357524, upload-time = "2026-04-14T15:11:19.717Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/2c/f742d60f818cba83760f4975c7158d1c96c36b5807e95a843db7fb8c64b7/tree_sitter_c_sharp-0.23.1-cp310-abi3-win_amd64.whl", hash = "sha256:d4486653feaff3314ef45534dcb6f9ea8ab3aa160896287c6473788f88eb38be", size = 338755, upload-time = "2026-04-14T15:11:20.883Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/e4/8a8642b9bba86248ac2facc81ffb187c06c6768efa56c79d61fab70d736b/tree_sitter_c_sharp-0.23.1-cp310-abi3-win_arm64.whl", hash = "sha256:e7a14b76ec23cc8386cf662d5ea602d81331376c93ca6299a97b174047790345", size = 337261, upload-time = "2026-04-14T15:11:22.111Z" },
     { url = "https://files.pythonhosted.org/packages/58/04/f6c2df4c53a588ccd88d50851155945cff8cd887bd70c175e00aaade7edf/tree_sitter_c_sharp-0.23.1-cp39-abi3-macosx_10_9_x86_64.whl", hash = "sha256:2b612a6e5bd17bb7fa2aab4bb6fc1fba45c94f09cb034ab332e45603b86e32fd", size = 372235, upload-time = "2024-11-11T05:25:19.424Z" },
     { url = "https://files.pythonhosted.org/packages/99/10/1aa9486f1e28fc22810fa92cbdc54e1051e7f5536a5e5b5e9695f609b31e/tree_sitter_c_sharp-0.23.1-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:1a8b98f62bc53efcd4d971151950c9b9cd5cbe3bacdb0cd69fdccac63350d83e", size = 419046, upload-time = "2024-11-11T05:25:20.679Z" },
     { url = "https://files.pythonhosted.org/packages/0f/21/13df29f8fcb9ba9f209b7b413a4764b673dfd58989a0dd67e9c7e19e9c2e/tree_sitter_c_sharp-0.23.1-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:986e93d845a438ec3c4416401aa98e6a6f6631d644bbbc2e43fcb915c51d255d", size = 415999, upload-time = "2024-11-11T05:25:22.359Z" },
@@ -8884,7 +9044,7 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 dependencies = [
-    { name = "markupsafe", marker = "python_full_version < '3.14'" },
+    { name = "markupsafe" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/32/af/d4502dc713b4ccea7175d764718d5183caf8d0867a4f0190d5d4a45cea49/werkzeug-3.1.1.tar.gz", hash = "sha256:8cd39dfbdfc1e051965f156163e2974e52c210f130810e9ad36858f0fd3edad4", size = 806453, upload-time = "2024-11-01T16:40:45.462Z" }
 wheels = [
@@ -8899,7 +9059,7 @@ resolution-markers = [
     "python_full_version >= '3.14'",
 ]
 dependencies = [
-    { name = "markupsafe", marker = "python_full_version >= '3.14'" },
+    { name = "markupsafe" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9f/69/83029f1f6300c5fb2471d621ab06f6ec6b3324685a2ce0f9777fd4a8b71e/werkzeug-3.1.3.tar.gz", hash = "sha256:60723ce945c19328679790e3282cc758aa4a6040e4bb330f53d30fa546d44746", size = 806925, upload-time = "2024-11-08T15:52:18.093Z" }
 wheels = [
