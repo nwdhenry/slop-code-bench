@@ -8,6 +8,12 @@ version: "0.1.0"
 run_root: .kludge-runs
 endpoint: http://127.0.0.1:11434
 backend: kludge.openai_compat@1
+# The longest successful turn recorded under smoke-4 telemetry
+# (.kludge-runs/l2m-*/events.jsonl, STEP RESPONDED, prompt_ns + predicted_ns)
+# was 57.6s (l2m-4, sequence 98), against 48 ReadTimeout failures at the
+# adapter default of 60s (kludge issue #603). 90s gives that turn ~32s of
+# headroom.
+request_timeout_s: 90
 cost_limits:
   cost_limit: 0
   step_limit: 0

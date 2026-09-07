@@ -64,6 +64,7 @@ def _session(tmp_path: Path, entry_file: str | None = None) -> Session:
 
 
 def _agent(tmp_path: Path, **overrides: object) -> KludgeAgent:
+    overrides.setdefault("request_timeout_s", 90.0)
     config = KludgeConfig(
         run_root=tmp_path / "runs",
         cost_limits=AgentCostLimits(cost_limit=0.0, net_cost_limit=0.0),
@@ -508,3 +509,68 @@ def test_save_artifacts_writes_no_blocked_runs_file_when_there_are_none(
     agent.save_artifacts(artifacts)
 
     assert not (artifacts / "blocked-runs.json").exists()
+
+
+def test_a_config_that_states_no_request_timeout_is_refused(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(Exception, match="request_timeout_s"):
+        KludgeConfig(
+            run_root=tmp_path / "runs",
+            cost_limits=AgentCostLimits(cost_limit=0.0, net_cost_limit=0.0),
+        )
+
+
+def test_the_identity_states_the_request_timeout(tmp_path: Path) -> None:
+    agent = _agent(tmp_path, request_timeout_s=45.0)
+
+    assert agent.identity()["request_timeout_s"] == 45.0
+
+
+def test_the_local_backend_receives_the_configured_request_timeout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    agent = _agent(tmp_path, request_timeout_s=45.0)
+    captured: dict[str, object] = {}
+
+    def _fake_openai_compat(**kwargs: object) -> object:
+        captured.update(kwargs)
+        return object()
+
+    import kludge_adapter_openai
+
+    monkeypatch.setattr(
+        kludge_adapter_openai, "openai_compat", _fake_openai_compat
+    )
+
+    agent._backend()
+
+    assert captured["timeout"] == 45.0
+
+
+def test_the_openrouter_backend_receives_the_configured_request_timeout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    agent = _agent(
+        tmp_path,
+        backend=OPENROUTER_BACKEND,
+        data_collection="deny",
+        request_timeout_s=45.0,
+    )
+    captured: dict[str, object] = {}
+
+    def _fake_openrouter(model: str, **kwargs: object) -> object:
+        captured.update(kwargs)
+        return object()
+
+    import kludge_adapter_openrouter
+
+    monkeypatch.setattr(
+        kludge_adapter_openrouter, "openrouter", _fake_openrouter
+    )
+
+    agent._backend()
+
+    assert captured["timeout"] == 45.0
