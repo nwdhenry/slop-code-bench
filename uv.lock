@@ -2400,7 +2400,7 @@ wheels = [
 [[package]]
 name = "kludge"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "kludge-api" },
     { name = "kludge-metrics" },
@@ -2411,7 +2411,7 @@ dependencies = [
 [[package]]
 name = "kludge-adapter-filetree"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-filetree&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-filetree&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "kludge-api" },
 ]
@@ -2419,7 +2419,7 @@ dependencies = [
 [[package]]
 name = "kludge-adapter-openai"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openai&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openai&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "httpx" },
     { name = "kludge-api" },
@@ -2429,7 +2429,7 @@ dependencies = [
 [[package]]
 name = "kludge-adapter-openrouter"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openrouter&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openrouter&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "httpx" },
     { name = "kludge-api" },
@@ -2439,12 +2439,12 @@ dependencies = [
 [[package]]
 name = "kludge-api"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-api&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-api&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 
 [[package]]
 name = "kludge-metrics"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-metrics&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-metrics&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "kludge-api" },
     { name = "kludge-resolve" },
@@ -2453,7 +2453,7 @@ dependencies = [
 [[package]]
 name = "kludge-resolve"
 version = "0.1.0a0"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-resolve&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-resolve&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "kludge-api" },
 ]
@@ -2461,7 +2461,7 @@ dependencies = [
 [[package]]
 name = "kludge-shared"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=shared%2Fkludge-shared&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=shared%2Fkludge-shared&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "kludge-api" },
 ]
@@ -2469,7 +2469,7 @@ dependencies = [
 [[package]]
 name = "kludge-swe"
 version = "0.1.0a1"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=verticals%2Fkludge-swe&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=verticals%2Fkludge-swe&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "kludge-api" },
     { name = "kludge-resolve" },
@@ -2479,7 +2479,7 @@ dependencies = [
 [[package]]
 name = "kludge-ui"
 version = "0.1.0a0"
-source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-ui&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac#ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" }
+source = { git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-ui&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5#11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" }
 dependencies = [
     { name = "kludge-api" },
     { name = "kludge-metrics" },
@@ -8129,13 +8129,13 @@ requires-dist = [
     { name = "isort", specifier = ">=6.0.1" },
     { name = "jupyter", specifier = ">=1.1.1" },
     { name = "kaleido", specifier = ">=1.2.0" },
-    { name = "kludge", git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" },
-    { name = "kludge-adapter-filetree", git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-filetree&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" },
-    { name = "kludge-adapter-openai", git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openai&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" },
-    { name = "kludge-adapter-openrouter", git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openrouter&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" },
-    { name = "kludge-api", git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-api&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" },
-    { name = "kludge-metrics", git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-metrics&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" },
-    { name = "kludge-swe", git = "https://github.com/nwdhenry/kludge?subdirectory=verticals%2Fkludge-swe&rev=ca5f6497b7ef0bab4b8acb1adc755bbb9eb646ac" },
+    { name = "kludge", git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" },
+    { name = "kludge-adapter-filetree", git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-filetree&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" },
+    { name = "kludge-adapter-openai", git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openai&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" },
+    { name = "kludge-adapter-openrouter", git = "https://github.com/nwdhenry/kludge?subdirectory=adapters%2Fkludge-adapter-openrouter&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" },
+    { name = "kludge-api", git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-api&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" },
+    { name = "kludge-metrics", git = "https://github.com/nwdhenry/kludge?subdirectory=packages%2Fkludge-metrics&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" },
+    { name = "kludge-swe", git = "https://github.com/nwdhenry/kludge?subdirectory=verticals%2Fkludge-swe&rev=11ab3dd8d8a2bd3a024d81551b86e8225d190cd5" },
     { name = "litellm", specifier = "<=1.82.6" },
     { name = "mini-swe-agent", specifier = ">=1.9.0" },
     { name = "mypy", specifier = ">=1.19.0" },
