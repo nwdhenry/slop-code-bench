@@ -271,7 +271,9 @@ class KludgeAgent(Agent):
                     clock=LogicalClock(),
                     implementations=implementations_of(flow),
                     run_inputs={
-                        "task": swe_domain.item_task(task, self.entry_file)
+                        "task": swe_domain.item_task(
+                            task, entry=self.entry_file
+                        )
                     },
                     domains={swe_domain.WORKSPACE: workspace},
                     backends={IMPLEMENTER: backend, VERIFIER: backend},

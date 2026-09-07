@@ -299,11 +299,16 @@ def test_setup_binds_the_formatted_entry_file(tmp_path: Path) -> None:
     assert agent.identity()["entry_file"] == "main.py"
 
 
-def test_the_run_names_the_bound_entry_file_as_the_task_path(
+def test_the_run_names_the_bound_entry_file_as_the_task_entry(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The flow's Task carries `path` equal to the session's entry file.
+    """The flow's Task carries `entry` equal to the session's entry file, and
+    no `path`.
+
+    `path` is the decomposed item's own single-file assignment; a whole-task
+    checkpoint carries none, or it would refuse every edit outside that one
+    file. `entry` is the path the checkpoint's change targets.
 
     Everything the flow itself would do with that Task is stubbed out: this
     test verifies only what the adapter hands the kernel's `run`, not what the
@@ -344,4 +349,5 @@ def test_the_run_names_the_bound_entry_file_as_the_task_path(
 
     agent.run("write the program")
 
-    assert captured["task"]["path"] == "main.py"
+    assert captured["task"]["entry"] == "main.py"
+    assert "path" not in captured["task"]

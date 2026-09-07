@@ -78,13 +78,13 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-kludge = { git = "https://github.com/nwdhenry/kludge", rev = "92f61593196e9403698fe30ad82d302677050f31", subdirectory = "packages/kludge" }
-kludge-api = { git = "https://github.com/nwdhenry/kludge", rev = "92f61593196e9403698fe30ad82d302677050f31", subdirectory = "packages/kludge-api" }
-kludge-swe = { git = "https://github.com/nwdhenry/kludge", rev = "92f61593196e9403698fe30ad82d302677050f31", subdirectory = "verticals/kludge-swe" }
-kludge-adapter-filetree = { git = "https://github.com/nwdhenry/kludge", rev = "92f61593196e9403698fe30ad82d302677050f31", subdirectory = "adapters/kludge-adapter-filetree" }
-kludge-adapter-openai = { git = "https://github.com/nwdhenry/kludge", rev = "92f61593196e9403698fe30ad82d302677050f31", subdirectory = "adapters/kludge-adapter-openai" }
-kludge-adapter-openrouter = { git = "https://github.com/nwdhenry/kludge", rev = "92f61593196e9403698fe30ad82d302677050f31", subdirectory = "adapters/kludge-adapter-openrouter" }
-kludge-metrics = { git = "https://github.com/nwdhenry/kludge", rev = "92f61593196e9403698fe30ad82d302677050f31", subdirectory = "packages/kludge-metrics" }
+kludge = { git = "https://github.com/nwdhenry/kludge", rev = "b81944f44b8ceca980171ec6dac49ca61ea17f34", subdirectory = "packages/kludge" }
+kludge-api = { git = "https://github.com/nwdhenry/kludge", rev = "b81944f44b8ceca980171ec6dac49ca61ea17f34", subdirectory = "packages/kludge-api" }
+kludge-swe = { git = "https://github.com/nwdhenry/kludge", rev = "b81944f44b8ceca980171ec6dac49ca61ea17f34", subdirectory = "verticals/kludge-swe" }
+kludge-adapter-filetree = { git = "https://github.com/nwdhenry/kludge", rev = "b81944f44b8ceca980171ec6dac49ca61ea17f34", subdirectory = "adapters/kludge-adapter-filetree" }
+kludge-adapter-openai = { git = "https://github.com/nwdhenry/kludge", rev = "b81944f44b8ceca980171ec6dac49ca61ea17f34", subdirectory = "adapters/kludge-adapter-openai" }
+kludge-adapter-openrouter = { git = "https://github.com/nwdhenry/kludge", rev = "b81944f44b8ceca980171ec6dac49ca61ea17f34", subdirectory = "adapters/kludge-adapter-openrouter" }
+kludge-metrics = { git = "https://github.com/nwdhenry/kludge", rev = "b81944f44b8ceca980171ec6dac49ca61ea17f34", subdirectory = "packages/kludge-metrics" }
 
 
 [project.optional-dependencies]
