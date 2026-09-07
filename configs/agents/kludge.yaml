@@ -13,7 +13,8 @@ backend: kludge.openai_compat@1
 # was 57.6s (l2m-4, sequence 98), against 48 ReadTimeout failures at the
 # adapter default of 60s (kludge issue #603). 90s gives that turn ~32s of
 # headroom.
-request_timeout_s: 90
+# A lower bound on silence, provisional until smoke-5 telemetry (owner ruling on kludge PR #588).
+idle_timeout_s: 90
 cost_limits:
   cost_limit: 0
   step_limit: 0

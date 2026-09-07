@@ -111,10 +111,11 @@ class KludgeConfig(AgentConfigBase, agent_type=AGENT_NAME):
     backend: str = DEFAULT_BACKEND
     data_collection: str | None = None
     wall_time_bound_s: int = 1800
-    request_timeout_s: float
-    """The per-request timeout handed to the backend adapter (CTL request
-    `timeout`). Required: a binding that states none gets the adapter's own
-    silent default, which a campaign cannot see or freeze (kludge issue #603).
+    idle_timeout_s: float
+    """The silence bound handed to the backend adapter (CTL request
+    `idle_timeout_s`). Required: a binding that states none gets the adapter's
+    own silent default, which a campaign cannot see or freeze (kludge issue
+    #603).
     """
 
 
@@ -134,7 +135,7 @@ class KludgeAgent(Agent):
         model: str,
         data_collection: str | None,
         wall_time_bound_s: int,
-        request_timeout_s: float,
+        idle_timeout_s: float,
     ) -> None:
         super().__init__(
             agent_name=AGENT_NAME,
@@ -150,7 +151,7 @@ class KludgeAgent(Agent):
         self.model = model
         self.data_collection = data_collection
         self.wall_time_bound_s = wall_time_bound_s
-        self.request_timeout_s = request_timeout_s
+        self.idle_timeout_s = idle_timeout_s
         self._session: Session | None = None
         self.entry_file: str | None = None
         self.checkpoint_sequence = 0
@@ -201,7 +202,7 @@ class KludgeAgent(Agent):
             model=model.internal_name or model.name,
             data_collection=config.data_collection,
             wall_time_bound_s=config.wall_time_bound_s,
-            request_timeout_s=config.request_timeout_s,
+            idle_timeout_s=config.idle_timeout_s,
         )
 
     def identity(self) -> dict[str, Any]:
@@ -213,7 +214,7 @@ class KludgeAgent(Agent):
             "endpoint": self.endpoint,
             "model": self.model,
             "flow": "kludge_swe.flow.swe_flow",
-            "request_timeout_s": self.request_timeout_s,
+            "idle_timeout_s": self.idle_timeout_s,
             "budgets": {
                 "max_steps_per_attempt": STEP_BUDGET,
                 "max_attempts_per_entry": ATTEMPT_BUDGET,
@@ -260,14 +261,14 @@ class KludgeAgent(Agent):
             return openrouter(
                 self.model,
                 provider=ProviderPolicy(data_collection=self.data_collection),
-                timeout=self.request_timeout_s,
+                idle_timeout_s=self.idle_timeout_s,
             )
         from kludge_adapter_openai import openai_compat
 
         return openai_compat(
             base_url=self.endpoint,
             model=self.model,
-            timeout=self.request_timeout_s,
+            idle_timeout_s=self.idle_timeout_s,
         )
 
     def run(self, task: str) -> None:
