@@ -57,6 +57,7 @@ from kludge_swe.flow import swe_flow
 from kludge_swe.session import WORKSPACE_DIR
 from kludge_swe.session import seed_workspace
 
+from slop_code.agent_runner.agent import RETRY_PROMPT
 from slop_code.agent_runner.agent import Agent
 from slop_code.agent_runner.agent import AgentConfigBase
 from slop_code.agent_runner.credentials import ProviderCredential
@@ -148,6 +149,11 @@ class KludgeAgent(Agent):
         self.last_run_directory: Path | None = None
         self.last_terminal: str | None = None
         self.last_manifests: dict[str, str] = {}
+        self.last_goal: str | None = None
+        """The task string the last non-retry `run()` received. A retry hands
+        the kernel a fresh run with no session to resume (#603): this is what
+        lets it repeat the checkpoint's own goal instead of the harness's
+        generic retry prompt."""
 
     @classmethod
     def _from_config(
@@ -243,10 +249,23 @@ class KludgeAgent(Agent):
         return openai_compat(base_url=self.endpoint, model=self.model)
 
     def run(self, task: str) -> None:
-        """Run one KLUDGE flow over the checkpoint's workspace."""
+        """Run one KLUDGE flow over the checkpoint's workspace.
+
+        A retry hands this the harness's fixed `RETRY_PROMPT` and no session to
+        resume, so a KLUDGE run started on it directly would run the kernel's
+        whole 15-step, 3-attempt flow against a 33-character goal instead of
+        the checkpoint's own task (kludge issue #603). The stored goal from
+        this checkpoint's first `run()` is used instead, and a fresh kernel run
+        starts on it, since the kernel keeps no session across runs to resume.
+        """
         session = self._session
         if session is None:
             raise AgentError("the agent was run before setup gave it a session")
+        if task == RETRY_PROMPT and self.last_goal is not None:
+            goal = self.last_goal
+        else:
+            goal = task
+            self.last_goal = task
         self.checkpoint_sequence += 1
         root = self.run_root / f"{self.problem_name}-{self.checkpoint_sequence}"
         if root.exists():
@@ -272,7 +291,7 @@ class KludgeAgent(Agent):
                     implementations=implementations_of(flow),
                     run_inputs={
                         "task": swe_domain.item_task(
-                            task, entry=self.entry_file
+                            goal, entry=self.entry_file
                         )
                     },
                     domains={swe_domain.WORKSPACE: workspace},
@@ -386,6 +405,7 @@ class KludgeAgent(Agent):
         self.last_run_directory = None
         self.last_terminal = None
         self.last_manifests = {}
+        self.last_goal = None
 
     def save_artifacts(self, path: Path) -> None:
         """Copy this checkpoint's KLUDGE run directory into the artifacts path."""

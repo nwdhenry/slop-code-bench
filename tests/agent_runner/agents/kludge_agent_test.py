@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from slop_code.agent_runner.agent import RETRY_PROMPT
 from slop_code.agent_runner.agent import Agent
 from slop_code.agent_runner.agents import kludge as kludge_module
 from slop_code.agent_runner.agents.kludge import AGENT_NAME
@@ -200,12 +201,14 @@ def test_reset_clears_the_checkpoint_state_and_keeps_the_sequence(
     agent.checkpoint_sequence = 2
     agent.last_run_directory = tmp_path
     agent.last_terminal = "done"
+    agent.last_goal = "write the program"
 
     agent.reset()
 
     assert agent.last_run_directory is None
     assert agent.last_terminal is None
     assert agent.checkpoint_sequence == 2
+    assert agent.last_goal is None
 
 
 def test_cleanup_releases_the_session(tmp_path: Path) -> None:
@@ -351,3 +354,89 @@ def test_the_run_names_the_bound_entry_file_as_the_task_entry(
 
     assert captured["task"]["entry"] == "main.py"
     assert "path" not in captured["task"]
+
+
+def _stub_run_dependencies(
+    monkeypatch: pytest.MonkeyPatch,
+    agent: KludgeAgent,
+    outcome_factory: object,
+    captured_goals: list[str],
+) -> None:
+    """Stub every KLUDGE runtime call `run()` makes except `run_inputs`.
+
+    `captured_goals` collects the `goal` field of each `run_inputs["task"]`
+    the adapter hands the kernel, one entry per `run()` call.
+    """
+
+    def _fake_run(flow: object, **kwargs: object) -> object:
+        captured_goals.append(kwargs["run_inputs"]["task"]["goal"])
+        return outcome_factory()
+
+    monkeypatch.setattr(
+        kludge_module, "seed_workspace", lambda root, source: None
+    )
+    monkeypatch.setattr(
+        kludge_module.RunDirectory, "open", lambda root, coordinate: object()
+    )
+    monkeypatch.setattr(kludge_module, "swe_flow", lambda: object())
+    monkeypatch.setattr(
+        kludge_module.FileTreeDomain, "open", lambda *a, **k: object()
+    )
+    monkeypatch.setattr(
+        kludge_module, "implementations_of", lambda flow: object()
+    )
+    monkeypatch.setattr(kludge_module, "run", _fake_run)
+    monkeypatch.setattr(agent, "_backend", lambda: object())
+    monkeypatch.setattr(agent, "_publish", lambda root, destination: None)
+    monkeypatch.setattr(agent, "_record_usage", lambda root: None)
+
+
+def test_a_retry_reruns_with_the_stored_checkpoint_goal(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A retry hands the kernel the checkpoint's original goal, never the
+    harness's literal `RETRY_PROMPT`: the kernel keeps no session to resume
+    across `run()` calls, so a run started on `RETRY_PROMPT` would run the
+    whole SWE flow against that 33-character string as its task (#603).
+    """
+    agent = _agent(tmp_path)
+    agent.setup(_session(tmp_path, entry_file="main.py"))
+
+    async def _accepted() -> SimpleNamespace:
+        return SimpleNamespace(
+            succeeded=True, terminal_state="accepted", cause=None
+        )
+
+    goals: list[str] = []
+    _stub_run_dependencies(monkeypatch, agent, _accepted, goals)
+
+    agent.run("implement the checkpoint's spec")
+    agent.retry()
+
+    assert goals == [
+        "implement the checkpoint's spec",
+        "implement the checkpoint's spec",
+    ]
+
+
+def test_a_retry_before_any_run_carries_the_retry_prompt_unchanged(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """With no stored goal to fall back to, a bare `run(RETRY_PROMPT)` carries
+    that string through unchanged; there is nothing else to run it with."""
+    agent = _agent(tmp_path)
+    agent.setup(_session(tmp_path, entry_file="main.py"))
+
+    async def _accepted() -> SimpleNamespace:
+        return SimpleNamespace(
+            succeeded=True, terminal_state="accepted", cause=None
+        )
+
+    goals: list[str] = []
+    _stub_run_dependencies(monkeypatch, agent, _accepted, goals)
+
+    agent.run(RETRY_PROMPT)
+
+    assert goals == [RETRY_PROMPT]
