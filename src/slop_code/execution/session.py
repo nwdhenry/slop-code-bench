@@ -52,6 +52,7 @@ class Session:
         workspace: Workspace,
         static_assets: dict[str, ResolvedStaticAsset] | None = None,
         is_agent_infer: bool = False,
+        entry_file: str | None = None,
     ):
         """Initialize a new session.
 
@@ -60,6 +61,8 @@ class Session:
             workspace: Workspace instance for file management
             static_assets: Optional static assets available to the session
             is_agent_infer: Whether this is an agent inference session
+            entry_file: The problem's entry file, formatted for this
+                environment. `None` where the problem names no entry file.
         """
         logger.debug(
             "Initializing session",
@@ -74,6 +77,7 @@ class Session:
         self._streaming_runtimes: list[StreamingRuntime] = []
         self._exec_runtimes: list[ExecRuntime] = []
         self.is_agent_infer = is_agent_infer
+        self.entry_file = entry_file
 
     def spawn(
         self,
@@ -340,6 +344,7 @@ class Session:
         static_assets: dict[str, ResolvedStaticAsset] | None = None,
         image_name: str | None = None,
         is_agent_infer: bool = False,
+        entry_file: str | None = None,
     ) -> "Session":
         """Create a session from an environment specification.
 
@@ -349,6 +354,8 @@ class Session:
             static_assets: Optional static assets
             image_name: Optional image name to use for the session
             is_agent_infer: Whether this is an agent inference session
+            entry_file: The problem's entry file, formatted for this
+                environment. `None` where the problem names no entry file.
 
         Returns:
             New Session instance
@@ -389,4 +396,5 @@ class Session:
             workspace=workspace,
             static_assets=static_assets,
             is_agent_infer=is_agent_infer,
+            entry_file=entry_file,
         )

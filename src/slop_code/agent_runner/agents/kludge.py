@@ -143,6 +143,7 @@ class KludgeAgent(Agent):
         self.data_collection = data_collection
         self.wall_time_bound_s = wall_time_bound_s
         self._session: Session | None = None
+        self.entry_file: str | None = None
         self.checkpoint_sequence = 0
         self.last_run_directory: Path | None = None
         self.last_terminal: str | None = None
@@ -199,14 +200,28 @@ class KludgeAgent(Agent):
                 "source": "the declared constants of kludge_swe.flow",
             },
             "wall_time_bound_s": self.wall_time_bound_s,
+            "entry_file": self.entry_file,
         }
         if self.backend == OPENROUTER_BACKEND:
             record[RETENTION_PARAMETER] = self.data_collection
         return record
 
     def setup(self, session: Session) -> None:
-        """Take the session and make the run root that holds KLUDGE evidence."""
+        """Take the session and make the run root that holds KLUDGE evidence.
+
+        The session's entry file is the checkpoint's declared implementation
+        target, formatted for the environment by the harness (`local-py`:
+        `{entry_file}.py`). The flow's inspection establishes an absent target
+        only when a Task names that path (#603), so a problem that names none
+        is refused here rather than silently inspecting nothing.
+        """
         self._session = session
+        self.entry_file = session.entry_file
+        if not self.entry_file:
+            raise AgentError(
+                f"the problem {self.problem_name!r} names no entry file; the "
+                "KLUDGE flow has no path to assign the item it runs"
+            )
         self.run_root.mkdir(parents=True, exist_ok=True)
 
     def _backend(self) -> Any:
@@ -255,7 +270,9 @@ class KludgeAgent(Agent):
                     run_dir=run_dir,
                     clock=LogicalClock(),
                     implementations=implementations_of(flow),
-                    run_inputs={"task": swe_domain.item_task(task, None)},
+                    run_inputs={
+                        "task": swe_domain.item_task(task, self.entry_file)
+                    },
                     domains={swe_domain.WORKSPACE: workspace},
                     backends={IMPLEMENTER: backend, VERIFIER: backend},
                 )

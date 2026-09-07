@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from slop_code.agent_runner.agent import Agent
+from slop_code.agent_runner.agents import kludge as kludge_module
 from slop_code.agent_runner.agents.kludge import AGENT_NAME
 from slop_code.agent_runner.agents.kludge import AGENT_VERSION
 from slop_code.agent_runner.agents.kludge import ATTEMPT_BUDGET
@@ -45,7 +47,7 @@ def _credential() -> ProviderCredential:
     )
 
 
-def _session(tmp_path: Path) -> Session:
+def _session(tmp_path: Path, entry_file: str | None = None) -> Session:
     starter = tmp_path / "starter"
     starter.mkdir()
     (starter / "README.md").write_text("starter\n", encoding="utf-8")
@@ -53,6 +55,7 @@ def _session(tmp_path: Path) -> Session:
         LocalEnvironmentSpec(type="local", name="test"),
         base_dir=starter,
         is_agent_infer=True,
+        entry_file=entry_file,
     )
     session.prepare()
     return session
@@ -117,7 +120,7 @@ def test_an_openrouter_binding_that_states_no_retention_is_refused(
 
 def test_setup_makes_the_run_root_outside_the_workspace(tmp_path: Path) -> None:
     agent = _agent(tmp_path)
-    session = _session(tmp_path)
+    session = _session(tmp_path, entry_file="main.py")
 
     agent.setup(session)
 
@@ -207,7 +210,7 @@ def test_reset_clears_the_checkpoint_state_and_keeps_the_sequence(
 
 def test_cleanup_releases_the_session(tmp_path: Path) -> None:
     agent = _agent(tmp_path)
-    agent.setup(_session(tmp_path))
+    agent.setup(_session(tmp_path, entry_file="main.py"))
 
     agent.cleanup()
 
@@ -274,3 +277,71 @@ def test_usage_accumulates_steps_across_kernel_runs(tmp_path: Path) -> None:
     agent.usage.steps += 7
 
     assert agent.usage.steps == 11
+
+
+def test_setup_refuses_a_problem_that_names_no_entry_file(
+    tmp_path: Path,
+) -> None:
+    agent = _agent(tmp_path)
+    session = _session(tmp_path)
+
+    with pytest.raises(AgentError, match="file_backup"):
+        agent.setup(session)
+
+
+def test_setup_binds_the_formatted_entry_file(tmp_path: Path) -> None:
+    agent = _agent(tmp_path)
+    session = _session(tmp_path, entry_file="main.py")
+
+    agent.setup(session)
+
+    assert agent.entry_file == "main.py"
+    assert agent.identity()["entry_file"] == "main.py"
+
+
+def test_the_run_names_the_bound_entry_file_as_the_task_path(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The flow's Task carries `path` equal to the session's entry file.
+
+    Everything the flow itself would do with that Task is stubbed out: this
+    test verifies only what the adapter hands the kernel's `run`, not what the
+    kernel does with it.
+    """
+    agent = _agent(tmp_path)
+    session = _session(tmp_path, entry_file="main.py")
+    agent.setup(session)
+
+    captured: dict[str, object] = {}
+
+    async def _accepted() -> SimpleNamespace:
+        return SimpleNamespace(
+            succeeded=True, terminal_state="accepted", cause=None
+        )
+
+    def _fake_run(flow: object, **kwargs: object) -> object:
+        captured.update(kwargs["run_inputs"])
+        return _accepted()
+
+    monkeypatch.setattr(
+        kludge_module, "seed_workspace", lambda root, source: None
+    )
+    monkeypatch.setattr(
+        kludge_module.RunDirectory, "open", lambda root, coordinate: object()
+    )
+    monkeypatch.setattr(kludge_module, "swe_flow", lambda: object())
+    monkeypatch.setattr(
+        kludge_module.FileTreeDomain, "open", lambda *a, **k: object()
+    )
+    monkeypatch.setattr(
+        kludge_module, "implementations_of", lambda flow: object()
+    )
+    monkeypatch.setattr(kludge_module, "run", _fake_run)
+    monkeypatch.setattr(agent, "_backend", lambda: object())
+    monkeypatch.setattr(agent, "_publish", lambda root, destination: None)
+    monkeypatch.setattr(agent, "_record_usage", lambda root: None)
+
+    agent.run("write the program")
+
+    assert captured["task"]["path"] == "main.py"

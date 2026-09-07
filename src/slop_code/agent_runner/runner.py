@@ -124,11 +124,17 @@ def create_agent_session(
         base_path=problem_config.path,
         assets=problem_config.static_assets,
     )
+    entry_file = (
+        environment_spec.format_entry_file(problem_config.entry_file)
+        if problem_config.entry_file
+        else None
+    )
     return Session.from_environment_spec(
         spec=environment_spec,
         base_dir=None,
         static_assets=static_assets,
         is_agent_infer=True,
+        entry_file=entry_file,
     )
 
 
