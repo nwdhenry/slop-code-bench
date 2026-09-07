@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import shutil
 from pathlib import Path
 from typing import Any, Literal
@@ -154,6 +155,12 @@ class KludgeAgent(Agent):
         the kernel a fresh run with no session to resume (#603): this is what
         lets it repeat the checkpoint's own goal instead of the harness's
         generic retry prompt."""
+        self.blocked_runs: list[dict[str, Any]] = []
+        """The terminal cause of every kernel run this checkpoint attempted
+        and did not accept, oldest first. A retry that then succeeds would
+        otherwise erase the first run's failure from the checkpoint's result
+        (kludge issue #603); this keeps it. Cleared per checkpoint by
+        `reset()`."""
 
     @classmethod
     def _from_config(
@@ -207,6 +214,7 @@ class KludgeAgent(Agent):
             },
             "wall_time_bound_s": self.wall_time_bound_s,
             "entry_file": self.entry_file,
+            "blocked_runs": list(self.blocked_runs),
         }
         if self.backend == OPENROUTER_BACKEND:
             record[RETENTION_PARAMETER] = self.data_collection
@@ -308,6 +316,14 @@ class KludgeAgent(Agent):
             "after": _identity(_manifest(workspace_source)),
         }
         if not outcome.succeeded:
+            self.blocked_runs.append(
+                {
+                    "checkpoint": self.checkpoint_sequence,
+                    "kind": outcome.cause.kind.name,
+                    "node": outcome.terminal_state,
+                    "detail": outcome.cause.detail,
+                }
+            )
             raise AgentError(
                 f"the KLUDGE run of {self.problem_name} checkpoint "
                 f"{self.checkpoint_sequence} reached no accepted terminal: "
@@ -406,9 +422,16 @@ class KludgeAgent(Agent):
         self.last_terminal = None
         self.last_manifests = {}
         self.last_goal = None
+        self.blocked_runs = []
 
     def save_artifacts(self, path: Path) -> None:
-        """Copy this checkpoint's KLUDGE run directory into the artifacts path."""
+        """Copy this checkpoint's KLUDGE run directory into the artifacts path.
+
+        A retry that later succeeds still leaves the checkpoint's earlier
+        blocked runs recorded here: `run_checkpoint` (`agent.py`) overwrites
+        `had_error`/`error_message` with the retry's own outcome, so this file
+        is where the earlier failure survives (kludge issue #603).
+        """
         source = self.last_run_directory
         if source is None or not source.is_dir():
             return
@@ -419,6 +442,10 @@ class KludgeAgent(Agent):
             dirs_exist_ok=True,
             ignore=shutil.ignore_patterns("__pycache__"),
         )
+        if self.blocked_runs:
+            (path / "blocked-runs.json").write_text(
+                json.dumps(self.blocked_runs, indent=2), encoding="utf-8"
+            )
 
     def cleanup(self) -> None:
         """Release the session reference. The run root is retained evidence."""

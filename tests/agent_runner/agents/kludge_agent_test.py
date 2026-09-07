@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -202,6 +203,7 @@ def test_reset_clears_the_checkpoint_state_and_keeps_the_sequence(
     agent.last_run_directory = tmp_path
     agent.last_terminal = "done"
     agent.last_goal = "write the program"
+    agent.blocked_runs = [{"kind": "BLOCKED"}]
 
     agent.reset()
 
@@ -209,6 +211,7 @@ def test_reset_clears_the_checkpoint_state_and_keeps_the_sequence(
     assert agent.last_terminal is None
     assert agent.checkpoint_sequence == 2
     assert agent.last_goal is None
+    assert agent.blocked_runs == []
 
 
 def test_cleanup_releases_the_session(tmp_path: Path) -> None:
@@ -440,3 +443,68 @@ def test_a_retry_before_any_run_carries_the_retry_prompt_unchanged(
     agent.run(RETRY_PROMPT)
 
     assert goals == [RETRY_PROMPT]
+
+
+def test_a_blocked_run_records_its_terminal_cause(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A run the kernel did not accept has its terminal cause recorded on the
+    agent before `AgentError` is raised, so a later retry that succeeds does
+    not erase this run's failure from the checkpoint's result (#603)."""
+    agent = _agent(tmp_path)
+    agent.setup(_session(tmp_path, entry_file="main.py"))
+
+    async def _blocked() -> SimpleNamespace:
+        cause = SimpleNamespace(
+            kind=SimpleNamespace(name="BLOCKED"),
+            detail="the chat-completions request failed: ReadTimeout",
+        )
+        return SimpleNamespace(succeeded=False, terminal_state="plan", cause=cause)
+
+    goals: list[str] = []
+    _stub_run_dependencies(monkeypatch, agent, _blocked, goals)
+
+    with pytest.raises(AgentError, match="BLOCKED"):
+        agent.run("implement the checkpoint's spec")
+
+    assert agent.blocked_runs == [
+        {
+            "checkpoint": 1,
+            "kind": "BLOCKED",
+            "node": "plan",
+            "detail": "the chat-completions request failed: ReadTimeout",
+        }
+    ]
+
+
+def test_save_artifacts_writes_the_blocked_runs_record(
+    tmp_path: Path,
+) -> None:
+    agent = _agent(tmp_path)
+    root = tmp_path / "run"
+    root.mkdir()
+    agent.last_run_directory = root
+    agent.blocked_runs = [
+        {"checkpoint": 1, "kind": "BLOCKED", "node": "plan", "detail": "x"}
+    ]
+    artifacts = tmp_path / "artifacts"
+
+    agent.save_artifacts(artifacts)
+
+    written = json.loads((artifacts / "blocked-runs.json").read_text())
+    assert written == agent.blocked_runs
+
+
+def test_save_artifacts_writes_no_blocked_runs_file_when_there_are_none(
+    tmp_path: Path,
+) -> None:
+    agent = _agent(tmp_path)
+    root = tmp_path / "run"
+    root.mkdir()
+    agent.last_run_directory = root
+    artifacts = tmp_path / "artifacts"
+
+    agent.save_artifacts(artifacts)
+
+    assert not (artifacts / "blocked-runs.json").exists()
