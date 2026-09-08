@@ -225,6 +225,7 @@ class KludgeAgent(Agent):
             "wall_time_bound_s": self.wall_time_bound_s,
             "entry_file": self.entry_file,
             "blocked_runs": list(self.blocked_runs),
+            "last_terminal": self.last_terminal,
         }
         if self.backend == OPENROUTER_BACKEND:
             record[RETENTION_PARAMETER] = self.data_collection

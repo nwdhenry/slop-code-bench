@@ -108,6 +108,16 @@ def test_the_identity_states_what_the_request_carries(tmp_path: Path) -> None:
     assert RETENTION_PARAMETER not in identity
 
 
+def test_the_identity_states_the_last_terminal(tmp_path: Path) -> None:
+    agent = _agent(tmp_path)
+
+    assert agent.identity()["last_terminal"] is None
+
+    agent.last_terminal = "closed"
+
+    assert agent.identity()["last_terminal"] == "closed"
+
+
 def test_an_openrouter_binding_states_its_retention(tmp_path: Path) -> None:
     agent = _agent(tmp_path, backend=OPENROUTER_BACKEND, data_collection="deny")
 
