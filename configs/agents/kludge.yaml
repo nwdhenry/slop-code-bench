@@ -15,6 +15,9 @@ backend: kludge.openai_compat@1
 # headroom.
 # A lower bound on silence, provisional until smoke-5 telemetry (owner ruling on kludge PR #588).
 idle_timeout_s: 90
+# Re-sends after the first attempt on a transport failure; the adapters
+# publish no default (kludge BE-R61). Two, as kludge examples/backends.py states.
+transport_retries: 2
 cost_limits:
   cost_limit: 0
   step_limit: 0

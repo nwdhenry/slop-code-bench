@@ -65,6 +65,7 @@ def _session(tmp_path: Path, entry_file: str | None = None) -> Session:
 
 def _agent(tmp_path: Path, **overrides: object) -> KludgeAgent:
     overrides.setdefault("idle_timeout_s", 90.0)
+    overrides.setdefault("transport_retries", 2)
     config = KludgeConfig(
         run_root=tmp_path / "runs",
         cost_limits=AgentCostLimits(cost_limit=0.0, net_cost_limit=0.0),

@@ -117,6 +117,11 @@ class KludgeConfig(AgentConfigBase, agent_type=AGENT_NAME):
     own silent default, which a campaign cannot see or freeze (kludge issue
     #603).
     """
+    transport_retries: int
+    """Re-sends after the first attempt on a transport failure. Required: the
+    adapters publish no default (kludge BE-R61), so the binding states the
+    bound the campaign freezes.
+    """
 
 
 class KludgeAgent(Agent):
@@ -136,6 +141,7 @@ class KludgeAgent(Agent):
         data_collection: str | None,
         wall_time_bound_s: int,
         idle_timeout_s: float,
+        transport_retries: int,
     ) -> None:
         super().__init__(
             agent_name=AGENT_NAME,
@@ -152,6 +158,7 @@ class KludgeAgent(Agent):
         self.data_collection = data_collection
         self.wall_time_bound_s = wall_time_bound_s
         self.idle_timeout_s = idle_timeout_s
+        self.transport_retries = transport_retries
         self._session: Session | None = None
         self.entry_file: str | None = None
         self.checkpoint_sequence = 0
@@ -203,6 +210,7 @@ class KludgeAgent(Agent):
             data_collection=config.data_collection,
             wall_time_bound_s=config.wall_time_bound_s,
             idle_timeout_s=config.idle_timeout_s,
+            transport_retries=config.transport_retries,
         )
 
     def identity(self) -> dict[str, Any]:
@@ -215,6 +223,7 @@ class KludgeAgent(Agent):
             "model": self.model,
             "flow": "kludge_swe.flow.swe_flow",
             "idle_timeout_s": self.idle_timeout_s,
+            "transport_retries": self.transport_retries,
             "budgets": {
                 "max_steps_per_attempt": STEP_BUDGET,
                 "max_attempts_per_entry": ATTEMPT_BUDGET,
@@ -262,6 +271,7 @@ class KludgeAgent(Agent):
             return openrouter(
                 self.model,
                 provider=ProviderPolicy(data_collection=self.data_collection),
+                transport_retries=self.transport_retries,
                 idle_timeout_s=self.idle_timeout_s,
             )
         from kludge_adapter_openai import openai_compat
@@ -269,6 +279,7 @@ class KludgeAgent(Agent):
         return openai_compat(
             base_url=self.endpoint,
             model=self.model,
+            transport_retries=self.transport_retries,
             idle_timeout_s=self.idle_timeout_s,
         )
 
