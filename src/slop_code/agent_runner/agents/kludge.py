@@ -315,8 +315,11 @@ class KludgeAgent(Agent):
                     implementations=implementations_of(flow),
                     run_inputs={
                         "task": swe_domain.item_task(
-                            goal, entry=self.entry_file
-                        )
+                            goal,
+                            entry=self.entry_file,
+                            policy=swe_domain.DEFAULT_WORKSPACE_POLICY,
+                        ),
+                        "workspace": dict(swe_domain.DEFAULT_WORKSPACE_POLICY),
                     },
                     domains={swe_domain.WORKSPACE: workspace},
                     backends={IMPLEMENTER: backend, VERIFIER: backend},
